@@ -1,0 +1,98 @@
+{
+  "suite_id": "ova-v2-tamper-suite-001",
+  "framework_version": "OpLogica v2.5",
+  "tested_bundle": "ova-test-2026-05-20-001",
+  "test_count": 6,
+  "tests_passing_expectation": 6,
+  "all_expectations_satisfied": true,
+  "test_results": [
+    {
+      "test_id": "T1_pon_break_quorum_axiom",
+      "tampered_field": "constitutional_layer.pon.votes[REGULATOR & ETHICS_BOARD]",
+      "tamper_description": "Flipped BOTH REGULATOR and ETHICS_BOARD votes from ACCEPT to REJECT in the registry-anchored vote list. Quorum Integrity Axiom requires at least one of REGULATOR/ETHICS_BOARD to ACCEPT.",
+      "expected_failed_checks": [
+        "pon_quorum_integrity"
+      ],
+      "actual_failed_checks": [
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_consensus_execution_binding",
+        "merkle_root_match"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "T2_poe_break_chain_link",
+      "tampered_field": "constitutional_layer.poe.versions[1].previous_version_hash",
+      "tamper_description": "Replaced CV_2.previous_version_hash with arbitrary value (all-f); recomputed chain_integrity_verified.",
+      "expected_failed_checks": [
+        "poe_chain_monotonicity"
+      ],
+      "actual_failed_checks": [
+        "poe_chain_monotonicity",
+        "merkle_root_match"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "T3_poo_change_input_hash",
+      "tampered_field": "operational_layer.poo.input_data_hash",
+      "tamper_description": "Replaced input_data_hash with all-zeros sha256.",
+      "expected_failed_checks": [
+        "poo_signature_valid",
+        "merkle_root_match"
+      ],
+      "actual_failed_checks": [
+        "poo_signature_valid",
+        "merkle_root_match"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "T4_por_invalid_reference",
+      "tampered_field": "operational_layer.por.conclusions[0].derived_from",
+      "tamper_description": "Added non-existent reference 'p_GHOST' to c1's derived_from list; recomputed structural consistency flag.",
+      "expected_failed_checks": [
+        "por_structural_consistency"
+      ],
+      "actual_failed_checks": [
+        "por_structural_consistency",
+        "merkle_root_match"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "T5_poc_silence_conflict",
+      "tampered_field": "operational_layer.poc.conflicts[0].silenced",
+      "tamper_description": "Set CF_1.silenced = True; recomputed completeness flags. PoC's design rejects any silenced conflict.",
+      "expected_failed_checks": [
+        "poc_record_integrity"
+      ],
+      "actual_failed_checks": [
+        "poc_record_integrity",
+        "merkle_root_match"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "T6_merkle_root_direct_swap",
+      "tampered_field": "merkle_root",
+      "tamper_description": "Replaced merkle_root with all-ones sha256 while leaving all five layers untouched. Verifier recomputes the root from layer contents.",
+      "expected_failed_checks": [
+        "merkle_root_match"
+      ],
+      "actual_failed_checks": [
+        "merkle_root_match"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    }
+  ],
+  "suite_summary": "Each tamper test mutates a single field in a deep-copied bundle and confirms that the verifier returns INVALID with the expected failed check(s). The original bundle is never modified. A passing test requires both: (1) the verifier returns INVALID, and (2) at least one of the expected failed checks appears in the actual failures.",
+  "executed_at": "2026-05-20T18:04:42Z"
+}

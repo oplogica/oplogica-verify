@@ -1,0 +1,53 @@
+{
+  "registry": {
+    "registry_id": "ova-governance-registry-v1",
+    "epoch_id": "epoch-2026-Q2",
+    "valid_from": "2026-04-01T00:00:00Z",
+    "valid_until": "2026-12-31T23:59:59Z",
+    "consensus_threshold": 0.66,
+    "critical_acceptor_roles": [
+      "REGULATOR",
+      "ETHICS_BOARD"
+    ],
+    "authorized_participants": {
+      "regulator-MOH-TR-01": {
+        "role": "REGULATOR",
+        "canonical_vote_weight": 1.0,
+        "public_key": "Ed25519-prototype-2026-pub:9e1a805083a1729fb66533eb00a0794ab52d6ebc4081ff022f16ef8fb4974311"
+      },
+      "ethics-board-IST-04": {
+        "role": "ETHICS_BOARD",
+        "canonical_vote_weight": 1.0,
+        "public_key": "Ed25519-prototype-2026-pub:c1016faeb069c8c57afa9cfba93434f1aad0b1437d4250cac28e668a6f3d6c18"
+      },
+      "domain-expert-EM-12": {
+        "role": "DOMAIN_EXPERT",
+        "canonical_vote_weight": 0.8,
+        "public_key": "Ed25519-prototype-2026-pub:eaef8fcce8b7a1c78fd46c149d8734acef733e834a6b90f76098a81823e5e0aa"
+      },
+      "affected-rep-PA-03": {
+        "role": "AFFECTED_PARTY_REP",
+        "canonical_vote_weight": 0.6,
+        "public_key": "Ed25519-prototype-2026-pub:670150086415a15cce1c4456d6cd7605873c42a987d02a8a88d6bff58cbb3628"
+      }
+    },
+    "authorized_operators": {
+      "operator-istanbul-hospital-ER-01": {
+        "public_key": "Ed25519-prototype-2026-pub:744ffe059c1dd80b1f50ce94a0f7288f671edf758d0c176d7560a0add3a7e47d"
+      }
+    },
+    "allowed_votes": [
+      "ACCEPT",
+      "REJECT",
+      "ABSTAIN"
+    ],
+    "registry_root_public_key": "Ed25519-prototype-2026-pub:9a8d0df16b071c5c8f12a889c40d9f88b19c8bd3211ca742f0ba8c4524d370de",
+    "registry_signature": "Ed25519-prototype-2026:637d58ffba220fb737354f346e8d79380a3d3eebdb335ede4370f8cd444d310241d5bb387e5f6bf91374e12f84f549892246cfda00b84073064ea6e3ebb9de06"
+  },
+  "registry_hash": "sha256:26abcffc27becf3bb63481452c434d3e9a7442d300af6018cb82d0edaf33b96a",
+  "trusted_root_public_key": "Ed25519-prototype-2026-pub:9a8d0df16b071c5c8f12a889c40d9f88b19c8bd3211ca742f0ba8c4524d370de",
+  "allowed_registry_hashes": [
+    "sha256:26abcffc27becf3bb63481452c434d3e9a7442d300af6018cb82d0edaf33b96a"
+  ],
+  "_note": "OVA v2.5 trust anchor. Rule-policy binding ensures each rule_applied in PoR carries policy_hash + constraint_hash, allowing the verifier to confirm rule provenance (not formal entailment) from the active policy."
+}

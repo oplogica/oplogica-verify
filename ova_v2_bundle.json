@@ -1,0 +1,345 @@
+{
+  "bundle_id": "ova-test-2026-05-20-001",
+  "framework_version": "OpLogica v2.5",
+  "timestamp_utc": "2026-05-20T18:53:14Z",
+  "hash_algorithm": "SHA-256",
+  "verification_scope": {
+    "trust_chain_property": "OVA v2.5 establishes a multi-layered trust chain: (1) Trusted root: verifier pins TRUSTED_REGISTRY_ROOT_PUBLIC_KEY out-of-band. (2) Signed registry: any accepted registry must carry a registry_signature valid under the trusted root AND its content hash must be in the pinned ALLOWED_REGISTRY_HASHES. (3) Temporal validity: registry valid_from/valid_until must bracket the PoO decision_timestamp. (4) Registry-anchored participant keys: each PoN vote is signed by the participant; the verifier resolves the participant public key from the registry, not from the bundle. (5) Registry-anchored operator key: the operator's public key is resolved from registry.authorized_operators, not from PoO metadata. (6) Policy-content binding: vote signatures and PoO bind to policy_hash (content hash of constraints), not just symbolic version IDs. (7) Active policy binding: votes counted toward quorum must bind to the EXACT policy that PoO executes (same epoch_id, policy_version_id, and policy_hash). (8) Rule-policy binding (NEW v2.5): each rule in PoR carries policy_hash and constraint_hash. The verifier rejects rules whose constraint does not exist in the active policy or whose constraint_hash does not match the recomputed value. This establishes RULE PROVENANCE, not semantic execution compliance. (9) Cross-layer binding: PoR signature is computed over a payload that includes poo_anchor. PoR cannot be grafted across bundles. (10) Independent computation: all *_verified flags inside the bundle are ignored; everything is recomputed from primitives. (11) DAG + reachability: PoR is checked for cycles AND for every conclusion having a derivation path to at least one premise.",
+    "rule_provenance_binding_property": "v2.5: Each rule_applied in PoR is bound to a specific constraint in the active policy via two hashes — policy_hash (the active policy's content hash) and constraint_hash (the hash of the specific constraint identified by from_constraint). The verifier independently recomputes both hashes from the active policy and rejects: (a) rules whose from_constraint does not exist in the active policy (arbitrary rule injection), (b) rules whose policy_hash does not match the active policy, (c) rules whose constraint_hash does not match the recomputation of the named constraint's canonical bytes (rule body tampering or fabrication). WHAT IS PROVEN: PoR uses rules authorized by the active policy and binds each rule invocation to the exact constraint content. WHAT IS NOT PROVEN: that the rules were applied CORRECTLY to produce the conclusions. Formal semantic execution compliance (every conclusion entails from premises under the declared rules) requires a constraint DSL plus SAT/SMT verification and is explicitly left for future work.",
+    "active_policy_binding_property": "Defeats cross-version vote grafting and cross-epoch vote replay. The verifier enforces a strict identity between the policy that quorum approved and the policy that PoO executes: every ACCEPT vote contributing to quorum must satisfy three bindings — vote.epoch_id == registry.epoch_id, vote.policy_version_id_anchor == PoO.policy_version_id, vote.policy_hash == PoO.policy_hash. Stale votes (from prior epochs) and votes for prior policy versions are excluded from the quorum calculation even when their cryptographic signatures verify. The system answers not just 'were these signatures real?' but 'did the quorum approve exactly what was executed?'.",
+    "policy_content_binding_property": "Every signed vote and every PoO commitment binds to policy_hash = SHA-256(canonical(constraints)). The symbolic version_id (e.g., 'CV_1') is metadata only. A malicious operator who edits constraints inside a version while preserving its version_id will change the policy_hash, and all existing signatures bound to the old policy_hash will fail to validate against the new constraint content. The verifier additionally recomputes policy_hash from the raw constraints array, defeating attempts to keep stored policy_hash in sync with old signatures.",
+    "cross_layer_binding_property": "PoR signature payload includes poo_anchor = {operational_hash, policy_version_id, policy_hash, decision_timestamp}. The verifier rejects any bundle where PoR.poo_anchor does not match the bundle's actual PoO. A valid PoR taken from a different (legitimate) bundle cannot be grafted onto this bundle's PoO without invalidating por_signature_binding_valid.",
+    "verifier_independence_property": "The verifier does NOT trust any *_verified, quorum_satisfied, graph_is_dag, accept_ratio, has_critical_acceptor, completeness_verified, chain_integrity_verified, or stored policy_hash. All integrity claims are recomputed from primitive records or resolved from the trusted registry.",
+    "governance_anchoring_property": "Constitutional rules — authorized participants, their roles, their canonical vote weights, the consensus threshold, the critical acceptor roles, the authorized operators and their public keys — come from a signed external registry. A malicious generator cannot rewrite these rules inside the bundle.",
+    "dag_and_reachability_property": "PoR's reason graph is verified for two structural properties: (a) acyclicity via DFS coloring; (b) reachability — every conclusion must trace back through derived_from edges to at least one premise. Conclusions that derive only from rules (floating logic islands) are rejected.",
+    "what_this_bundle_verifies": {
+      "cryptographic_integrity": "All layer hashes and the Merkle root can be recomputed by any independent party. Tampering with any field is detectable.",
+      "structural_provenance": "Records which premises, rules, and conclusions were used in PoR; which conflicts were detected in PoC; which constraint version was active in PoO; how constraints evolved in PoE; who participated in the negotiation in PoN.",
+      "signature_authenticity": "Cryptographic signatures by the declared operator can be verified against the operator's public key (prototype: Ed25519).",
+      "governance_chain_integrity": "PoE chain is append-only and monotonic; PoN quorum integrity axiom is checked (REGULATOR or ETHICS_BOARD must be in ACCEPT)."
+    },
+    "what_this_bundle_does_NOT_verify": {
+      "formal_logical_entailment": "PoR v2.5 records the reasoning graph, verifies that all references resolve to existing nodes, performs DFS-based cycle detection, performs reachability checking from conclusions back to premises, AND binds each rule invocation to the exact content of the active policy via policy_hash + constraint_hash. This is rule PROVENANCE binding — it does NOT prove that conclusions formally entail from premises under the declared rules. CONCRETE EXAMPLE OF THE GAP: A rule 'IF vital_score < 0.4 THEN priority = HIGH' with premise 'vital_score = 0.38' but recorded conclusion 'priority = MEDIUM' would NOT be detected by OVA v2.5 as a semantic inconsistency, because the verifier confirms rule provenance (the rule is authorized and bound to the active policy) but does not evaluate whether the conclusion logically follows from applying the rule to the premise. Formal semantic execution compliance requires (a) a constraint DSL that the rules are expressed in, and (b) a separate verification engine (e.g., SAT/SMT solver, theorem prover) that takes the constraints and premises and confirms the conclusions are valid derivations. This is explicitly out of scope for v2.5 and left for future work.",
+      "moral_or_ethical_correctness": "The constraints negotiated in PoN may be auditable as to their genesis, but their substantive moral correctness is outside the scope of this framework. Documentation of negotiation is not endorsement of outcome.",
+      "clinical_or_domain_correctness": "The triage priority assignment is the output of declared rules applied to declared inputs. The framework does NOT validate that the rules represent best clinical practice or that the priority assignment is medically optimal.",
+      "representativeness_of_negotiation": "PoN documents that participants with named roles voted, but does NOT verify that those participants are legitimately representative of affected populations. Legitimacy is a sociopolitical question outside cryptographic verification.",
+      "resolution_protocol_justification": "PoC documents which resolution protocol was chosen (LEXICOGRAPHIC, WEIGHTED_SUM, etc.) — it does NOT justify why that protocol was the correct choice for the domain.",
+      "conflict_completeness_silent_omission": "PoC verifies the INTEGRITY of recorded conflicts (none silenced, protocols valid). It does NOT verify that all conflicts that SHOULD have been detected were in fact recorded. A malicious or buggy decision engine could omit a conflict entirely from PoC, and the verifier would not detect the omission. Detecting silent omission requires an independent conflict detector that applies the constraints to the decision state and produces an expected conflict set to compare against. This is left for future work. Accordingly, the relevant check is named 'poc_record_integrity' (not 'poc_conflict_completeness') to avoid overclaim.",
+      "production_grade_cryptography": "Signatures use Ed25519 (prototype). Production deployment targets ML-DSA / Dilithium-III (FIPS 204, post-quantum). The current bundle should NOT be treated as quantum-resistant.",
+      "key_revocation_not_supported_in_active_epoch": "Within a single governance epoch, OVA v2.3 has NO mechanism to revoke a compromised participant key, operator key, or registry root key. If a private key is leaked mid-epoch, the attacker can produce valid-looking bundles until the next registry rotation. Mitigations are out-of-band: (a) issuing a new registry with a different ALLOWED_HASH and re-pinning the verifier; (b) externally annotating affected bundles as revoked in a transparency log. Future work: signed CRL/OCSP-style revocation anchor, or transparency-log-based revocation events that the verifier consults alongside the registry.",
+      "merkle_compliance": "Merkle root uses a simple binary tree with last-node duplication for odd counts. NOT compliant with RFC 6962 (Certificate Transparency). Compliance is left for future work."
+    },
+    "what_is_left_for_future_work": [
+      "Constraint DSL + formal semantic execution verification: define a domain-specific language for constraints and implement a SAT/SMT-based verifier (e.g., Z3, CVC5) that takes the active policy's constraints plus PoR's premises and confirms each conclusion is a valid derivation. This would turn rule provenance binding into formal entailment proof.",
+      "Formal verification of verifier logic using TLA+ or Coq: beyond empirical adversarial testing, produce a mathematical proof that the verifier algorithm is free of logical gaps and unhandled edge cases. Complements the constraint-DSL + SAT/SMT work above: SAT/SMT covers CONTENT correctness (does premise + rule entail conclusion?), TLA+/Coq covers ALGORITHM correctness (is the verifier itself sound?).",
+      "Performance benchmarking on large bundles: empirical measurement of verifier latency and memory consumption under scaled constraint sets, particularly in resource-constrained or distributed environments. The current implementation prioritizes clarity over performance and uses deepcopy in the test suites; production deployment may require streaming verification or incremental Merkle proofs.",
+      "Implement key revocation: signed CRL, OCSP, or transparency-log-based revocation events consulted by the verifier alongside the registry.",
+      "Implement an independent conflict detector that applies the active constraint set to the decision state to produce an expected conflict set, then compare against PoC's recorded conflicts to detect silent omission.",
+      "Upgrade Ed25519 to ML-DSA (Dilithium-III) for post-quantum security per FIPS 204.",
+      "Adopt RFC 6962 Merkle tree construction for interoperability with existing transparency log infrastructure.",
+      "Separate PoR signing identity from PoO operator identity to support multi-party reasoning attribution.",
+      "Extend tamper test coverage to all five proof layers and to the Merkle root itself.",
+      "Define a formal trust model for PoN participants and their representativeness."
+    ],
+    "claims_classification": {
+      "verified_by_this_bundle": "cryptographic + structural integrity",
+      "NOT_verified_by_this_bundle": "formal entailment, ethical correctness, clinical correctness, representativeness legitimacy, protocol justification"
+    }
+  },
+  "constitutional_layer": {
+    "pon": {
+      "epoch_id": "epoch-2026-Q2",
+      "negotiation_timestamp_t0": "2026-05-15T10:00:00Z",
+      "governance_registry_hash": "sha256:e8c84c011b25b7de3a4e710c5c9526c8590c32994e1624004044efa303f40e07",
+      "votes": [
+        {
+          "participant_id": "regulator-MOH-TR-01",
+          "vote": "ACCEPT",
+          "epoch_id": "epoch-2026-Q2",
+          "policy_version_id_anchor": "CV_2",
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "vote_timestamp": "2026-05-15T10:00:00Z",
+          "signature": "Ed25519-prototype-2026:fb7c6fa0d5833a843280189701ca4ab0c557749fa2ad3d51a7a96065170575146293f76ba27712d47cad36114fc24c21fd976adb6f3a32858804798c7004ea00"
+        },
+        {
+          "participant_id": "ethics-board-IST-04",
+          "vote": "ACCEPT",
+          "epoch_id": "epoch-2026-Q2",
+          "policy_version_id_anchor": "CV_2",
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "vote_timestamp": "2026-05-15T10:00:00Z",
+          "signature": "Ed25519-prototype-2026:304397e083a01eb4b232e05fff0aaf3e315d282aaa81f8c616b4bc4a194db62aaea3a096860e2493474788de78521b8e11746686e4ebde58060df2cb69fbfb02"
+        },
+        {
+          "participant_id": "domain-expert-EM-12",
+          "vote": "ACCEPT",
+          "epoch_id": "epoch-2026-Q2",
+          "policy_version_id_anchor": "CV_2",
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "vote_timestamp": "2026-05-15T10:00:00Z",
+          "signature": "Ed25519-prototype-2026:18571434b0a5c440c03072e61271103564d0f6ad878ca999bfb58aeb861d29ec679a5f0f8576a40700497bea9510e46af5df89a4f8fcf62455a3d0a417190d0f"
+        },
+        {
+          "participant_id": "affected-rep-PA-03",
+          "vote": "ACCEPT",
+          "epoch_id": "epoch-2026-Q2",
+          "policy_version_id_anchor": "CV_2",
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "vote_timestamp": "2026-05-15T10:00:00Z",
+          "signature": "Ed25519-prototype-2026:a6f28ad35c202f270483fedcbba2f5fffdb0b7a8e09c7c5a3b99407d1f32dd8c0b5f196559e6d0b1022b494867ea5b1e45c7f3460e3e39ae46686519da903004"
+        }
+      ],
+      "consensus_mechanism": "WEIGHTED_QUORUM",
+      "_metadata_note": "Advisory metadata only. Verifier recomputes quorum from registry + signed votes."
+    },
+    "poe": {
+      "versions": [
+        {
+          "version_id": "CV_1",
+          "effective_date": "2026-04-01T10:00:00Z",
+          "constraints": [
+            {
+              "id": "C1",
+              "name": "Urgency Rule",
+              "rule": "IF vital_score<0.4 AND life_threatening THEN priority=HIGH AND max_wait_minutes=5"
+            },
+            {
+              "id": "C2",
+              "name": "Fairness Rule",
+              "rule": "IF priority=HIGH AND protected_group THEN escalation_review=REQUIRED",
+              "fairness_bound": 0.15
+            },
+            {
+              "id": "C3",
+              "name": "Wait-Time Rule",
+              "rule": "IF wait_minutes>30 AND priority=MEDIUM THEN priority=HIGH"
+            },
+            {
+              "id": "C4",
+              "name": "Escalation Protocol",
+              "rule": "IF escalation_review=REQUIRED THEN review_mode=PARALLEL_NON_BLOCKING AND attach escalation_record_id"
+            }
+          ],
+          "policy_hash": "sha256:6cb45fa0a452cd5e57a02cdc8476a9367ef405a6b11163d3fe39d38ae792c4b3",
+          "previous_version_hash": null,
+          "justification": "Genesis version from PoN epoch-2026-Q2.",
+          "self_hash": "sha256:9e205980727bfcc987a5d34e853878b4338a943951e9aa1bf50b906f12a9d4d6"
+        },
+        {
+          "version_id": "CV_2",
+          "effective_date": "2026-05-15T09:00:00Z",
+          "constraints": [
+            {
+              "id": "C1",
+              "name": "Urgency Rule",
+              "rule": "IF vital_score<0.4 AND life_threatening THEN priority=HIGH AND max_wait_minutes=5"
+            },
+            {
+              "id": "C2",
+              "name": "Fairness Rule",
+              "rule": "IF priority=HIGH AND protected_group THEN escalation_review=REQUIRED",
+              "fairness_bound": 0.15
+            },
+            {
+              "id": "C3",
+              "name": "Wait-Time Rule",
+              "rule": "IF wait_minutes>25 AND priority=MEDIUM THEN priority=HIGH"
+            },
+            {
+              "id": "C4",
+              "name": "Escalation Protocol",
+              "rule": "IF escalation_review=REQUIRED THEN review_mode=PARALLEL_NON_BLOCKING AND attach escalation_record_id"
+            }
+          ],
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "previous_version_hash": "sha256:9e205980727bfcc987a5d34e853878b4338a943951e9aa1bf50b906f12a9d4d6",
+          "justification": "Ethics board review tightened wait-time threshold from 30 to 25 minutes.",
+          "self_hash": "sha256:8fdac542e1e45669ae4e9f0f6739173ad4cfe4402f2087483a2048e22dd7db3f"
+        }
+      ],
+      "current_version_id": "CV_2",
+      "chain_length": 2,
+      "chain_integrity_verified": true
+    }
+  },
+  "operational_layer": {
+    "poo": {
+      "input_data_hash": "sha256:68d1d80690824630781ef6025ef94c6a3e3e3c9087fdc93cc981bbb673714183",
+      "policy_version_id": "CV_2",
+      "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+      "decision_timestamp": "2026-05-20T14:32:01Z",
+      "operational_hash": "sha256:a488327f531d022630e465922b06149c634618e6bb6b797fac12c8f71fc54e35",
+      "operator_id": "operator-istanbul-hospital-ER-01",
+      "operator_signature": "Ed25519-prototype-2026:4e3ac9474f3e58673e59fa5a0b22d090cb40a135931f10bc4d512c1bf0bacded99ee864eb0f49681c088d6111dc40168a47f1d79feb0048de553b0dafd7ab904",
+      "signature_scheme": "Ed25519-prototype-2026",
+      "production_signature_target": "ML-DSA (Dilithium-III, FIPS 204)",
+      "_signed_bytes_b64hint": "canonical(D) || '||' || P || '||' || T",
+      "_metadata_public_key": "Ed25519-prototype-2026-pub:7a2fe9ca5fcd0c372854fa1c8f873c4bcfbe97a79e6629fd369f599366c3d26a",
+      "_metadata_note": "Advisory only. Verifier resolves operator's public key from registry.authorized_operators[operator_id]."
+    },
+    "por": {
+      "premises": [
+        {
+          "id": "p1",
+          "fact": "vital_score = 0.38"
+        },
+        {
+          "id": "p2",
+          "fact": "life_threatening = TRUE"
+        },
+        {
+          "id": "p3",
+          "fact": "wait_minutes = 12"
+        },
+        {
+          "id": "p4",
+          "fact": "demographic_group = protected_group_A"
+        }
+      ],
+      "rules_applied": [
+        {
+          "id": "r1",
+          "from_constraint": "C1",
+          "applied_as": "vital<0.4 AND life_threatening → priority=HIGH",
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "constraint_hash": "sha256:163b80f567030b5ba22f712ae9a4efa5bd4a9a844ed9267a56cb0307535ee948"
+        },
+        {
+          "id": "r2",
+          "from_constraint": "C2",
+          "applied_as": "priority=HIGH AND protected_group → escalation_review=REQUIRED",
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "constraint_hash": "sha256:d751eeee34e609a844b15235b7a302a3bc1f9cd18a4238addcff0d309aa1c4c0"
+        },
+        {
+          "id": "r3",
+          "from_constraint": "C4",
+          "applied_as": "escalation_review=REQUIRED → review_mode=PARALLEL_NON_BLOCKING + attach record_id",
+          "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+          "constraint_hash": "sha256:41bd94857dbd8e6266318b518440349430a813ddaca6aa479709b8ff695766cf"
+        }
+      ],
+      "conclusions": [
+        {
+          "id": "c1",
+          "value": "priority = HIGH",
+          "derived_from": [
+            "p1",
+            "p2",
+            "r1"
+          ]
+        },
+        {
+          "id": "c2",
+          "value": "escalation_review = REQUIRED",
+          "derived_from": [
+            "c1",
+            "p4",
+            "r2"
+          ]
+        },
+        {
+          "id": "c3",
+          "value": "review_mode = PARALLEL_NON_BLOCKING",
+          "derived_from": [
+            "c2",
+            "r3"
+          ]
+        },
+        {
+          "id": "c4",
+          "value": "escalation_record_id = ESC-001-2026",
+          "derived_from": [
+            "c2",
+            "r3"
+          ]
+        }
+      ],
+      "logic_delta": {
+        "before": {
+          "priority": "UNASSIGNED"
+        },
+        "after": {
+          "priority": "HIGH",
+          "escalation_review": "REQUIRED",
+          "review_mode": "PARALLEL_NON_BLOCKING",
+          "escalation_record_id": "ESC-001-2026"
+        }
+      },
+      "graph_is_dag": true,
+      "structural_consistency_verified": true,
+      "verification_type": "structural_provenance_plus_rule_binding",
+      "formal_entailment_verified": false,
+      "formal_entailment_note": "PoR v2.5 records the reasoning graph, verifies reference resolution, and binds each rule invocation to the exact constraint content via constraint_hash. It does NOT verify that conclusions formally entail from premises under the declared rules — that requires a SAT/SMT solver and is left for future work. What is proven: PoR uses authorized policy rules (rule provenance binding). What is NOT proven: the rules were applied correctly to produce the conclusions.",
+      "poo_anchor": {
+        "operational_hash": "sha256:a488327f531d022630e465922b06149c634618e6bb6b797fac12c8f71fc54e35",
+        "policy_version_id": "CV_2",
+        "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
+        "decision_timestamp": "2026-05-20T14:32:01Z"
+      },
+      "graph_signature": "Ed25519-prototype-2026:8c8ce1435a116b7385327966ad6c5b5fdf02cf9c1b32ff81bd58e14c9bd00831a1631f20177d96fd8c6aeef3699b8e12c5ee927988b4b12b911c89350f1f3004"
+    },
+    "poc": {
+      "conflicts": [
+        {
+          "conflict_id": "CF_1",
+          "conflicting_constraints": [
+            "C1",
+            "C2"
+          ],
+          "tension_type": "execution_timing",
+          "description": "C1 demands immediate action (max_wait=5min); C2 demands escalation_review which adds time.",
+          "resolution_protocol": "LEXICOGRAPHIC",
+          "priority_order": [
+            "urgency",
+            "fairness_review"
+          ],
+          "resolution_outcome": "HIGH priority with PARALLEL_NON_BLOCKING review",
+          "silenced": false,
+          "documented_at": "2026-05-20T14:32:01Z"
+        }
+      ],
+      "conflict_count": 1,
+      "any_silenced": false,
+      "protocols_valid": true,
+      "completeness_verified": true
+    }
+  },
+  "layer_hashes": {
+    "pon_hash": "sha256:0d4c8208a1c8e3ffd8c3da01bba5f82a915bf420159d76a267ad9a0bd8700ac5",
+    "poe_hash": "sha256:bafcd778d913633c5455d3011637556f347bccea3c382ad15e423b2235c24504",
+    "poo_hash": "sha256:713916f1682d60386bb6b68f72c88d554c5fab4ac2eb5e3711e618f3afee27c4",
+    "por_hash": "sha256:6ac80eab3e8ab10762d819c9f4ed396a25d7464f68a82be517cf92daae2df59f",
+    "poc_hash": "sha256:c0ccd69ef71287b6393e84d5fc8b9f6a071412361851ab08ab05e956fdbbbe81"
+  },
+  "merkle_root": "sha256:64af7272a86aa6260b7e831c5e9587fd96e06272c696086d66d7f3fb9f3e4240",
+  "merkle_order": [
+    "pon",
+    "poe",
+    "poo",
+    "por",
+    "poc"
+  ],
+  "verifier_result": {
+    "status": "VALID",
+    "checks_passed": [
+      "registry_signature_valid",
+      "registry_temporal_validity",
+      "pon_quorum_integrity",
+      "pon_vote_signatures_valid",
+      "poe_chain_monotonicity",
+      "policy_hash_consistency",
+      "policy_consensus_execution_binding",
+      "poo_signature_valid",
+      "por_signature_binding_valid",
+      "por_rule_policy_binding",
+      "por_structural_consistency",
+      "poc_record_integrity",
+      "merkle_root_match"
+    ],
+    "checks_failed": [],
+    "verification_timestamp": "2026-05-20T18:53:14Z",
+    "checks_total": 13,
+    "trust_chain_summary": "Trusted root → signed registry → registry-anchored participant & operator keys → signed votes + signed PoO/PoR → Merkle root over all five layers."
+  }
+}

@@ -1,0 +1,300 @@
+{
+  "suite_id": "ova-v2-malicious-generator-suite-001",
+  "framework_version": "OpLogica v2.5",
+  "tested_bundle": "ova-test-2026-05-20-001",
+  "attack_model": "Malicious generator with knowledge of and access to all cryptographic keys. Tests cover three attack classes: (1) flag-lying — writing false *_verified flags while keeping internal hash consistency; (2) governance-anchoring — attempting to rewrite constitutional rules (threshold, weights, roles, participant identity) inside the bundle; (3) DAG verification — claiming graph_is_dag while embedding a cycle. Defense in each case is independent recomputation from primitive records and the external governance registry.",
+  "test_count": 20,
+  "tests_passing_expectation": 20,
+  "all_expectations_satisfied": true,
+  "test_results": [
+    {
+      "test_id": "MG_A_pon_lying_metadata",
+      "attack_model": "malicious_generator",
+      "description": "All authorized participants vote REJECT, but generator writes _metadata_quorum_satisfied=true in advisory fields. Hashes and Merkle root are consistent. Verifier must ignore metadata and recompute from votes + registry.",
+      "expected_failed_checks": [
+        "pon_quorum_integrity"
+      ],
+      "actual_failed_checks": [
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_consensus_execution_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_B_poe_lying_flags",
+      "attack_model": "malicious_generator",
+      "description": "CV_2.previous_version_hash does not match CV_1, but generator writes chain_integrity_verified=true. All hashes and Merkle root are recomputed to be consistent with the lying flag.",
+      "expected_failed_checks": [
+        "poe_chain_monotonicity"
+      ],
+      "actual_failed_checks": [
+        "poe_chain_monotonicity"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_C_por_lying_flags",
+      "attack_model": "malicious_generator",
+      "description": "PoR contains an unresolved ghost reference, but generator writes structural_consistency_verified=true. Generator re-signs PoR and PoO with a fresh operator key. Verifier must catch the ghost by recomputing reference resolution.",
+      "expected_failed_checks": [
+        "por_structural_consistency"
+      ],
+      "actual_failed_checks": [
+        "poo_signature_valid",
+        "por_structural_consistency"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_D_poc_lying_flags",
+      "attack_model": "malicious_generator",
+      "description": "Conflict CF_1 has silenced=true, but generator writes any_silenced=false and completeness_verified=true. Hashes and Merkle root are consistent with the lying flags.",
+      "expected_failed_checks": [
+        "poc_record_integrity"
+      ],
+      "actual_failed_checks": [
+        "poc_record_integrity"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_E_threshold_manipulation",
+      "attack_model": "malicious_generator_governance",
+      "description": "Generator tries to inject a low consensus_threshold into the bundle. Verifier must use registry threshold (0.66), not bundle-supplied value.",
+      "expected_failed_checks": [
+        "pon_quorum_integrity"
+      ],
+      "actual_failed_checks": [
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_hash_consistency",
+        "policy_consensus_execution_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_F_puppet_participant",
+      "attack_model": "malicious_generator_governance",
+      "description": "Generator submits votes from 'PUPPET-001', a participant not in the authorized registry. Verifier must reject the vote as unauthorized.",
+      "expected_failed_checks": [
+        "pon_quorum_integrity"
+      ],
+      "actual_failed_checks": [
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_hash_consistency",
+        "policy_consensus_execution_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_G_inflated_weight",
+      "attack_model": "malicious_generator_governance",
+      "description": "Generator tries to attach FAKE_inflated_weight=999 to a vote. Verifier uses canonical_vote_weight from the registry only.",
+      "expected_failed_checks": [
+        "pon_quorum_integrity"
+      ],
+      "actual_failed_checks": [
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_hash_consistency",
+        "policy_consensus_execution_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_H_role_escalation",
+      "attack_model": "malicious_generator_governance",
+      "description": "Generator tries to claim 'affected-rep-PA-03' has role REGULATOR. Verifier reads role from registry, not from bundle.",
+      "expected_failed_checks": [
+        "pon_quorum_integrity"
+      ],
+      "actual_failed_checks": [
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_hash_consistency",
+        "policy_consensus_execution_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_I_circular_reasoning",
+      "attack_model": "malicious_generator_dag",
+      "description": "Generator builds c1 <-> c2 circular dependency. Claims graph_is_dag=true and re-signs PoR. Verifier must run actual cycle detection (DFS coloring) and reject the cycle.",
+      "expected_failed_checks": [
+        "por_structural_consistency"
+      ],
+      "actual_failed_checks": [
+        "poo_signature_valid",
+        "por_structural_consistency"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_J_registry_substitution",
+      "attack_model": "malicious_generator_pki",
+      "description": "Attacker fabricates a registry signed by their own root key (with attacker as participant, threshold=0.01). Verifier rejects because TRUSTED_REGISTRY_ROOT_PUBLIC_KEY is pinned out-of-band.",
+      "expected_failed_checks": [
+        "registry_signature_valid"
+      ],
+      "actual_failed_checks": [
+        "registry_signature_valid",
+        "registry_temporal_validity",
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_consensus_execution_binding",
+        "poo_signature_valid",
+        "por_structural_consistency"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_K_vote_forgery",
+      "attack_model": "malicious_generator_pki",
+      "description": "Attacker signs the regulator's vote payload with an attacker-generated key. Verifier resolves the regulator's public key from the registry and the signature fails to verify.",
+      "expected_failed_checks": [
+        "pon_vote_signatures_valid"
+      ],
+      "actual_failed_checks": [
+        "pon_vote_signatures_valid"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_L_operator_key_substitution",
+      "attack_model": "malicious_generator_pki",
+      "description": "Attacker writes their own public key into PoO's metadata field and re-signs with it. Verifier resolves operator key from registry.authorized_operators, not from PoO, so the signature fails.",
+      "expected_failed_checks": [
+        "poo_signature_valid"
+      ],
+      "actual_failed_checks": [
+        "poo_signature_valid"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_M_registry_version_skew",
+      "attack_model": "malicious_generator_pki",
+      "description": "Registry is properly signed and pinned, but its valid_until is in the past relative to the decision timestamp. Verifier rejects on temporal validity.",
+      "expected_failed_checks": [
+        "registry_temporal_validity"
+      ],
+      "actual_failed_checks": [
+        "registry_temporal_validity"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_N_unsigned_registry",
+      "attack_model": "malicious_generator_pki",
+      "description": "Attacker strips registry_signature from the registry. Verifier rejects because the signature is required.",
+      "expected_failed_checks": [
+        "registry_signature_valid"
+      ],
+      "actual_failed_checks": [
+        "registry_signature_valid",
+        "registry_temporal_validity",
+        "pon_quorum_integrity",
+        "pon_vote_signatures_valid",
+        "policy_consensus_execution_binding",
+        "poo_signature_valid",
+        "por_structural_consistency"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_O_floating_logic_island",
+      "attack_model": "malicious_generator_dag",
+      "description": "Attacker builds conclusions that only derive from rules, with no path back to any premise. Reasoning is structurally consistent and acyclic but ungrounded. Verifier's reachability check rejects.",
+      "expected_failed_checks": [
+        "por_structural_consistency"
+      ],
+      "actual_failed_checks": [
+        "por_structural_consistency"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_P_policy_payload_substitution",
+      "attack_model": "malicious_generator_policy_forgery",
+      "description": "Attacker injects an extra constraint into CV_1 after the negotiation, keeping the stored policy_hash and version_id unchanged. Vote signatures still verify cryptographically against the old payload, but the verifier recomputes policy_hash from raw constraints and detects the discrepancy.",
+      "expected_failed_checks": [
+        "policy_hash_consistency"
+      ],
+      "actual_failed_checks": [
+        "policy_hash_consistency"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_Q_cross_layer_graph_grafting",
+      "attack_model": "malicious_generator_cross_layer",
+      "description": "Attacker grafts a valid PoR (signed correctly, anchored to a different patient's PoO) onto this bundle's PoO. The verifier checks PoR.poo_anchor against this bundle's actual PoO and rejects on the binding mismatch.",
+      "expected_failed_checks": [
+        "por_signature_binding_valid"
+      ],
+      "actual_failed_checks": [
+        "por_signature_binding_valid"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_R_cross_version_vote_grafting",
+      "attack_model": "malicious_generator_cross_version",
+      "description": "Attacker uses real, signed votes for CV_1 to claim consensus, but PoO executes CV_2. Without active policy binding, both 'CV_1 votes valid' and 'CV_2 is a real policy in PoE' are individually true. The active-policy-binding check requires every ACCEPT vote to match PoO's policy_hash exactly.",
+      "expected_failed_checks": [
+        "policy_consensus_execution_binding"
+      ],
+      "actual_failed_checks": [
+        "policy_consensus_execution_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_S_cross_epoch_vote_replay",
+      "attack_model": "malicious_generator_cross_epoch",
+      "description": "Attacker replays votes signed in a prior epoch (epoch-2025-Q1) into the current epoch (epoch-2026-Q2). Each signature is cryptographically valid against the participant's still-authorized key, but the epoch_id in the signed payload does not match the active registry's epoch_id.",
+      "expected_failed_checks": [
+        "policy_consensus_execution_binding"
+      ],
+      "actual_failed_checks": [
+        "policy_consensus_execution_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    },
+    {
+      "test_id": "MG_T_arbitrary_rule_injection",
+      "attack_model": "malicious_generator_rule_injection",
+      "description": "Attacker injects an extra rule into PoR with a fabricated constraint_hash. The rule claims to derive from a real constraint (C1), the policy_hash is correct, but constraint_hash does not match the recomputation of C1's content. The verifier rejects on por_rule_policy_binding.",
+      "expected_failed_checks": [
+        "por_rule_policy_binding"
+      ],
+      "actual_failed_checks": [
+        "por_rule_policy_binding"
+      ],
+      "actual_status": "INVALID",
+      "expectation_satisfied": true
+    }
+  ],
+  "executed_at": "2026-05-20T18:04:42Z"
+}
