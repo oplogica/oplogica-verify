@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
@@ -3571,8 +3572,9 @@ if __name__ == "__main__":
           f"{suite['test_count']} passed")
 
     # Malicious-generator suite (NEW — verifier independence)
-    print("\n[4] Malicious-generator suite (4 tests, verifier independence)")
     mg_suite = run_malicious_generator_suite(bundle, patient_data)
+    print(f"\n[4] Malicious-generator suite "
+          f"({mg_suite['test_count']} tests, verifier independence)")
     for t in mg_suite["test_results"]:
         mark = "✓" if t["expectation_satisfied"] else "✗"
         print(f"    {mark} {t['test_id']}")
@@ -3581,20 +3583,21 @@ if __name__ == "__main__":
     print(f"    Malicious-generator suite: "
           f"{mg_suite['tests_passing_expectation']}/{mg_suite['test_count']} passed")
 
-    # Save the clean bundle to disk
-    output_path = "/home/claude/ova_v2_bundle.json"
+    # Save the clean bundle to disk (next to the script)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_path = os.path.join(script_dir, "ova_v2_bundle.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(bundle, f, indent=2, ensure_ascii=False)
     print(f"\n[5] Bundle saved to: {output_path}")
 
     # Save the tamper suite result
-    suite_path = "/home/claude/ova_v2_tamper_suite.json"
+    suite_path = os.path.join(script_dir, "ova_v2_tamper_suite.json")
     with open(suite_path, "w", encoding="utf-8") as f:
         json.dump(suite, f, indent=2, ensure_ascii=False)
     print(f"    Tamper suite saved to: {suite_path}")
 
     # Save the malicious-generator suite result
-    mg_path = "/home/claude/ova_v2_malicious_generator_suite.json"
+    mg_path = os.path.join(script_dir, "ova_v2_malicious_generator_suite.json")
     with open(mg_path, "w", encoding="utf-8") as f:
         json.dump(mg_suite, f, indent=2, ensure_ascii=False)
     print(f"    Malicious-generator suite saved to: {mg_path}")
