@@ -1,4 +1,4 @@
-# OpLogica Verify
+ # OpLogica Verify
 
 **Cryptographic governance-to-execution verification for AI decision systems.**
 
@@ -12,7 +12,7 @@ When an automated system makes a decision under a policy that humans negotiated,
 
 OpLogica Verify (OVA) is a five-layer cryptographic proof bundle that answers that question with a verifier any auditor can run offline. It is deliberately scoped: it proves cryptographic governance-to-execution binding, not formal logical correctness of the decision, not its ethical soundness, and not perfect detection of omitted conflicts. Those limits are declared explicitly throughout the artifacts.
 
-The architecture survived six rounds of adversarial review by two independent AI systems (GPT and Gemini), each of which found at least one blocking issue per round until v2.5. Two further independent reviews (DeepSeek and a seventh Gemini pass) found no blocking issues in v2.5.
+The architecture was hardened through six rounds of adversarial probing with GPT and Gemini, followed by independent review from DeepSeek and a final Gemini pass. These models were used as adversarial probes, not authorities: every accepted critique was converted into an executable test or an explicit scoped limitation before it counted.
 
 ---
 
@@ -133,6 +133,8 @@ Each check is independent and recomputed from primitives. A bundle is `VALID` on
 ## Adversarial hardening journey: v2.0 → v2.5
 
 OVA v2 was rebuilt from a rejected paper (v1) submitted to *AI and Ethics* in December 2025. Each version below was triggered by a specific blocking issue raised in adversarial review. The pattern was: review → blocking issue → fix → new malicious test → next review. **No diagram, no public exposure, no LinkedIn post was produced until v2.5 cleared two independent reviews with zero blocking issues.**
+
+> **Methodological note.** GPT, Gemini, and DeepSeek were used as adversarial probes, not authorities. A critique counted only when it became an executable test or an explicit scoped limitation. The "blocking issue identified by" column below records which probe surfaced each issue, not which probe decided the architecture was acceptable — that determination is made by the verifier, the test suites, and the explicit scope declarations in `verification_scope`.
 
 | Version | Blocking issue identified by | Architectural response |
 |---|---|---|
