@@ -204,6 +204,27 @@ These are limitations of the current proof of concept, not bugs. Each is declare
 
 ---
 
+## Related work
+
+Recent 2026 work has begun converging on cryptographic governance for autonomous AI systems. The closest adjacent effort is:
+
+**Aegis — Cryptographic Runtime Governance for Autonomous AI Systems** (Mazzocchetti, arXiv:2603.16938, March 2026). Proposes a runtime enforcement architecture in which autonomous agents are bound to a cryptographically sealed Immutable Ethics Policy Layer at genesis, with an Ethics Verification Agent, Enforcement Kernel Module, and Immutable Logging Kernel enforcing policy constraints during execution. Reports median proof verification latency of 238 ms and publication overhead of 9.4 ms in simulation.
+
+OVA v2.5 differs in scope and method:
+
+- **Scope.** Aegis prevents policy violations at runtime through autonomous enforcement and shutdown. OVA verifies, after the fact and offline, that an executed decision was bound to the approved policy, that invoked rules trace back to that policy via `constraint_hash`, and that the resulting proof bundle remained tamper-evident.
+- **Method.** Aegis is simulation-based and evaluated through latency benchmarks. OVA is implementation-based and evaluated through 6 tamper tests and 20 malicious-generator tests, each of which targets a specific verifier check with surgical precision.
+- **Distribution.** OVA is released as open-source Python under Apache 2.0 with a working verifier, executable test suites, and reproducible proof bundles. No public Aegis implementation appears to be available at the time of this writing.
+
+In one line:
+
+- **Aegis:** runtime enforcement of policy compliance.
+- **OVA v2.5:** post-hoc cryptographic governance-to-execution verification.
+
+Other relevant 2026 work includes runtime path-based governance (Kaptein et al., arXiv:2603.16586), capability-context separation for AI agent tool use (Zhou, arXiv:2603.14332), and zero-knowledge approaches to verifiable AI inference (e.g., Chainlink's ZKML, EigenAI arXiv:2602.00182). The field is converging on the general idea that AI accountability requires cryptographic, not contractual, enforcement; OVA's specific contribution is a fully reproducible verifier and adversarial-hardening methodology for post-hoc governance-to-execution binding.
+
+---
+
 ## Future work
 
 Listed in priority order, top to bottom.
