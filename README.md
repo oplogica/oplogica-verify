@@ -279,7 +279,7 @@ A formal paper is in preparation. Watch this repository for updates.
 
 **Production readiness:** Research prototype. The artifacts in this repository demonstrate the architectural and cryptographic properties listed under [What OVA v2.5 proves](#what-ova-v25-proves). Production deployment would require the items listed under [Future work](#future-work), particularly key revocation, post-quantum signatures, and the constraint DSL + SAT/SMT integration.
 
-**License:** TBD — see `LICENSE` once published.
+**License:** Apache License 2.0 — see [`LICENSE`](LICENSE).
 
 **Contact:** [oplogica-research@oplogica.com](mailto:oplogica-research@oplogica.com) — research questions, replication attempts, adversarial reviews welcome.
 
