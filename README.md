@@ -1,8 +1,12 @@
- # OpLogica Verify
+# OpLogica Verify
 
 **Cryptographic governance-to-execution verification for AI decision systems.**
 
+*Rule provenance and governance binding — not formal decision correctness.*
+
 Current release: **OVA v2.5** — Proof of Concept
+
+> This repository is a research-grade proof-of-concept, not a production compliance product.
 
 ---
 
@@ -255,7 +259,7 @@ A formal paper is in preparation. Watch this repository for updates.
 
 **Current release:** OVA v2.5 — proof of concept
 
-**Production readiness:** Not yet. The artifacts in this repository demonstrate the architectural and cryptographic properties listed under [What OVA v2.5 proves](#what-ova-v25-proves). Production deployment requires the items listed under [Future work](#future-work), particularly key revocation, post-quantum signatures, and the constraint DSL + SAT/SMT integration.
+**Production readiness:** Research prototype. The artifacts in this repository demonstrate the architectural and cryptographic properties listed under [What OVA v2.5 proves](#what-ova-v25-proves). Production deployment would require the items listed under [Future work](#future-work), particularly key revocation, post-quantum signatures, and the constraint DSL + SAT/SMT integration.
 
 **License:** TBD — see `LICENSE` once published.
 
