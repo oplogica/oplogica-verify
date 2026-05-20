@@ -232,11 +232,8 @@ oplogica-verify/
 ├── ova_v2_malicious_generator_suite.json    # malicious-generator test results
 ├── oplogica_v2_foundation.md                # response to Reviewer 1
 ├── triage_scenario.md                       # scenario specification
-├── adversarial_review_request.md            # template used to elicit reviews
-└── docs/
-    ├── oplogica_verify_v2_5_diagram.svg
-    ├── oplogica_verify_v2_5_diagram.png
-    └── oplogica_verify_v2_5_linkedin_1200.png
+├── oplogica_verify_v2_5_diagram.svg         # architecture diagram (vector)
+└── oplogica_verify_v2_5_diagram.png         # architecture diagram (raster)
 ```
 
 ---
