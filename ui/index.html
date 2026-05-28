@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OVA Evidence Integrity Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== Masthead ===== -->
+  <header class="masthead">
+    <div class="eyebrow">OpLogica · OVA</div>
+    <h1>OVA Evidence Integrity Demo</h1>
+    <div id="health" class="health"><span class="dot"></span><span id="health-text">checking API…</span></div>
+  </header>
+
+  <div class="banner" id="triage-banner">
+    <strong>Synthetic medical triage scenario.</strong> Not clinical advice.
+    Not a medical device. Not validated for clinical use. Data is illustrative
+    and fabricated for demo purposes. Demo keys only — not HSM-backed, not
+    production PKI.
+  </div>
+
+  <div class="banner scope" id="scope-banner">
+    <strong>Scope.</strong> This demo verifies evidence integrity and binding
+    only: whether the recorded artifacts are authentic, internally consistent,
+    and untampered under the demo trust root. It does not establish decision
+    correctness, model behavior fairness, or legal readiness, and is not
+    intended for critical deployment. The conflict check confirms that recorded
+    conflicts stay visible and intact — it does not detect every possible
+    conflict. The reasoning checks confirm the recorded reasoning graph is well
+    formed, authenticated, and bound to the policy and operation — they do not
+    establish reasoning quality or formal entailment.
+  </div>
+
+  <!-- ===== Verify section ===== -->
+  <section id="verify-section">
+    <h2>Verify a bundle</h2>
+    <p class="lead">Paste a bundle, governance registry, and trust root (and
+      optionally the raw input data), then verify offline through the API. Use
+      <em>Load demo clean inputs</em> to populate the fields, or load them from
+      the generated <span class="mono">exports/</span> files.</p>
+
+    <div class="grid2">
+      <div>
+        <label for="bundle">bundle (JSON)</label>
+        <textarea id="bundle" spellcheck="false" placeholder="{ ...proof bundle... }"></textarea>
+      </div>
+      <div>
+        <label for="registry">registry (JSON)</label>
+        <textarea id="registry" spellcheck="false" placeholder="{ ...governance registry... }"></textarea>
+      </div>
+      <div>
+        <label for="trust_root">trust_root (JSON)</label>
+        <textarea id="trust_root" spellcheck="false" placeholder='{ "trusted_root_public_key": "...", "allowed_registry_hashes": ["..."] }'></textarea>
+      </div>
+      <div>
+        <label for="input_data">input_data (JSON, optional)</label>
+        <textarea id="input_data" spellcheck="false" placeholder="{ ...raw decision input... }"></textarea>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="btn-load-clean" class="secondary" type="button">Load demo clean inputs</button>
+      <button id="btn-apply-t4" class="secondary" type="button">Apply T4 tamper to bundle</button>
+      <button id="btn-verify" type="button">Verify</button>
+    </div>
+    <p class="footnote">Demo inputs are read from <span class="mono">../exports/</span>
+      (run the pipeline first: <span class="mono">python3 ova_demo/run_demo.py --out ./exports</span>).
+      If they are not found, paste JSON manually.</p>
+
+    <div id="result" class="result" hidden></div>
+  </section>
+
+  <!-- ===== Tamper explainer (T4) ===== -->
+  <section id="tamper-section">
+    <h2>Tamper demonstration — T4 (reasoning graph)</h2>
+    <p class="lead">T4 adds a non-existent reference
+      (<span class="mono">p_GHOST</span>) to a reasoning conclusion. One narrow
+      mutation produces two failed checks and causes two more checks not to run.
+      Use <em>Apply T4 tamper to bundle</em> above, then <em>Verify</em>, to see
+      it live.</p>
+
+    <div class="why">
+      <div class="box">
+        <h3>Why T4 fails</h3>
+        <p><span class="tag fail-tag">por_structural_consistency</span> — the
+          conclusion references a node that does not exist, so the recorded
+          reasoning graph is malformed. (This does not establish anything about
+          whether the reasoning was good — only that the recorded structure is
+          broken.)</p>
+        <p><span class="tag fail-tag">merkle_root_match</span> — changing the
+          reasoning layer changes its hash, so the recomputed Merkle root no
+          longer matches the stored root.</p>
+      </div>
+      <div class="box">
+        <h3>Why two checks do not run</h3>
+        <p><span class="tag skip-tag">por_signature_binding_valid</span> and
+          <span class="tag skip-tag">por_rule_policy_binding</span> sit inside
+          the same reasoning block, after the structural gate. When the
+          structural check fails, the engine short-circuits past them.</p>
+        <p>The reconciliation layer reports them by name as
+          <strong>not run</strong>, with a reason — instead of letting them
+          quietly disappear. Passed + failed + not&nbsp;run always sums to 13.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Report ===== -->
+  <section id="report-section">
+    <h2>Evidence Integrity Report</h2>
+    <p class="lead">The full human-readable report is generated to
+      <span class="mono">exports/evidence_integrity_report.md</span>.</p>
+    <p>Open it directly:
+      <a id="report-link" href="../exports/evidence_integrity_report.md">../exports/evidence_integrity_report.md</a>
+      &nbsp;·&nbsp; or render it as Markdown in any viewer.</p>
+    <p class="footnote">The report includes: the clean-bundle summary with the
+      meaning / not-meaning block, a summary table of all six tamper cases, a
+      per-case detail section with failed and not-run checks and their
+      explanations, reproduction commands, and a limitations section.</p>
+  </section>
+
+  <!-- ===== Reproduction commands ===== -->
+  <section id="repro-section">
+    <h2>Reproduce from the command line</h2>
+
+    <h3>Run the full demo</h3>
+    <pre class="cmd">python3 ova_demo/run_demo.py --out ./exports</pre>
+
+    <h3>Verify the clean bundle (expect VALID, exit 0)</h3>
+    <pre class="cmd">python3 ova_demo/verify_bundle.py exports/clean_bundle.json \
+  --registry exports/registry.json \
+  --trust-root exports/trust_root.json \
+  --input-data exports/input_data.json</pre>
+
+    <h3>Verify the T4 tampered bundle (expect INVALID, exit 1)</h3>
+    <pre class="cmd">python3 ova_demo/verify_bundle.py exports/tampered_T4_por.json \
+  --registry exports/registry.json \
+  --trust-root exports/trust_root.json \
+  --input-data exports/input_data.json</pre>
+
+    <p class="footnote">Exit codes for <span class="mono">verify_bundle.py</span>:
+      0 = reconciled VALID, 1 = reconciled INVALID, 2 = usage/file/JSON error.</p>
+  </section>
+
+  <hr class="soft" />
+  <p class="footnote">Reference implementation in Python. Go/Rust SDKs do not
+    exist. Signatures are Ed25519-prototype-2026 (not post-quantum); the
+    production target ML-DSA (Dilithium-III, FIPS 204) is declared but not
+    implemented. The Merkle tree is a simple binary tree and does not implement
+    the RFC 6962 construction.</p>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

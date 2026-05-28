@@ -1,0 +1,21 @@
+# OVA demo — Python dependencies.
+#
+# Core engine (ova_engine, ova_demo, CLI):
+cryptography>=42.0
+
+# API (api/server.py) and local dashboard serving:
+fastapi>=0.110
+uvicorn>=0.27
+
+# Notes:
+# - pydantic ships as a FastAPI dependency; it is imported directly by the API
+#   and is listed transitively via fastapi. Pin explicitly if you need a
+#   specific major version:
+#   pydantic>=2.0
+#
+# - The test suite uses fastapi.testclient, which requires httpx. Install it
+#   for running tests:
+#   httpx>=0.27
+#
+# This project intentionally has NO database, authentication, or cloud
+# dependencies. It is a local, offline-capable demo.
