@@ -1,0 +1,28 @@
+OVA — OpLogica Verification Architecture (demo)
+Copyright 2026 OpLogica Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+the files in this repository except in compliance with the License. You may
+obtain a copy of the License in the LICENSE file or at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+----------------------------------------------------------------------
+
+Trademark notice
+
+The Apache-2.0 license applies to the CODE in this repository. It does not
+grant any rights to use the "OpLogica" or "OVA" names, logos, or other brand
+or trademark assets. The names are used here only to identify the project.
+Using the code does not grant permission to use these marks to endorse or
+promote derived products, or to imply affiliation with OpLogica Inc.
+
+----------------------------------------------------------------------
+
+Scope notice
+
+This repository is a demonstration. A verifying evidence bundle shows that the
+recorded artifacts are internally consistent and tamper-evident under the demo
+trust root. It does not establish decision correctness, model behavior
+fairness, or legal readiness, and it is not intended for critical deployment.
+See docs/LIMITATIONS.md and docs/THREAT_MODEL.md.
