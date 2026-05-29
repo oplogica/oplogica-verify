@@ -1,15 +1,21 @@
-﻿# Legacy v2.5 Artifacts
+# Legacy v2.5 Artifacts
 
-This directory contains earlier OVA v2.5 proof-of-concept artifacts that were originally kept at the repository root.
+This directory holds historical OVA v2.5 proof-of-concept artifacts, retained
+for provenance and comparison with the current demo.
 
-They are preserved for historical reference only.
+`legacy/` is **NOT** the live demo entrypoint.
 
-For the current reproducible demo, use:
+The live demo runs from:
 
-- README.md
-- ova_demo/
-- ova_engine/
-- api/
-- ui/
-- tests/
-- docs/
+- `ova_engine/`
+- `ova_demo/`
+- `api/`
+- `ui/`
+
+For instructions and scope, see the root `README.md`.
+
+Live demo URL:
+
+```
+https://oplogica.com/ova-demo/
+```

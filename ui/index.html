@@ -65,9 +65,13 @@
       </div>
     </div>
 
+    <p class="instruction">Start with <em>Load demo clean inputs</em>, then
+      <em>Verify</em>. Use <em>Apply T4 tamper</em> to see intentional tamper
+      detection.</p>
+
     <div class="row">
       <button id="btn-load-clean" class="secondary" type="button">Load demo clean inputs</button>
-      <button id="btn-apply-t4" class="secondary" type="button">Apply T4 tamper to bundle</button>
+      <button id="btn-apply-t4" class="warn" type="button" title="This intentionally breaks the bundle">Apply T4 tamper to bundle</button>
       <button id="btn-verify" type="button">Verify</button>
     </div>
     <p class="footnote">Demo inputs are read from <span class="mono">../exports/</span>
@@ -119,6 +123,8 @@
     <p>Open it directly:
       <a id="report-link" href="../exports/evidence_integrity_report.md">../exports/evidence_integrity_report.md</a>
       &nbsp;·&nbsp; or render it as Markdown in any viewer.</p>
+    <p class="instruction">Public demo artifacts are intentionally exposed for
+      reproducibility. They use synthetic data and demo-only trust material.</p>
     <p class="footnote">The report includes: the clean-bundle summary with the
       meaning / not-meaning block, a summary table of all six tamper cases, a
       per-case detail section with failed and not-run checks and their

@@ -167,6 +167,29 @@ button.secondary {
 }
 button.secondary:hover { background: var(--green-tint); }
 
+/* Amber/warning button — used for actions that intentionally break the bundle
+   (e.g. Apply T4 tamper). Communicates "this is a destructive demo step";
+   wiring and id are unchanged. */
+button.warn {
+  background: var(--warn-bg);
+  color: #6B4E10;
+  border: 1px solid var(--warn-line);
+}
+button.warn:hover { background: #F7E6B6; }
+
+/* Short, visible instruction note — used near input/button rows and near the
+   public-artifacts area. Distinct from .lead (which is the section intro) and
+   .footnote (which is small print). */
+.instruction {
+  background: var(--warn-bg);
+  border-left: 3px solid var(--warn-line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 10px 0;
+  font-size: 13px;
+  color: #5B4A1A;
+}
+
 /* ---- Result ---- */
 .result { margin-top: 16px; }
 .status-pill {

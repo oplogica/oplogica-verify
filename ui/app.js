@@ -19,15 +19,17 @@
 
 const $ = (id) => document.getElementById(id);
 
-// ---- API base. Same-origin by default (served by FastAPI static mount). ----
-const API_BASE = "";
+// ---- API base. Same-origin, derived from the page URL so absolute fetches
+// reach the same FastAPI mount whether we're served locally at /ui/ or behind
+// a reverse-proxy subpath such as /ova-demo/ui/. Strips "/ui" or "/ui/...".
+const API_BASE = location.pathname.replace(/\/ui\/?.*$/, "");
 
-// Demo artifact locations on the API's /exports mount (absolute, same-origin).
+// Demo artifact locations on the API's /exports mount (same-origin).
 const EXPORT_FILES = {
-  bundle: "/exports/clean_bundle.json",
-  registry: "/exports/registry.json",
-  trust_root: "/exports/trust_root.json",
-  input_data: "/exports/input_data.json",
+  bundle:     `${API_BASE}/exports/clean_bundle.json`,
+  registry:   `${API_BASE}/exports/registry.json`,
+  trust_root: `${API_BASE}/exports/trust_root.json`,
+  input_data: `${API_BASE}/exports/input_data.json`,
 };
 
 // ---- Health check ----

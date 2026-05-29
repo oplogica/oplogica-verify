@@ -1,5 +1,9 @@
 # OVA — Evidence Integrity Demo
 
+**Live demo:** https://oplogica.com/ova-demo/
+
+TODO: Add dashboard screenshot/GIF before broad public launch.
+
 OVA (the OpLogica Verification Architecture) generates a cryptographically
 verifiable **evidence bundle** for a governance-bound AI decision and lets
 anyone **independently re-verify** it offline. This repository is a runnable,
@@ -205,7 +209,7 @@ Or run them all:
 for t in tests/test_*.py; do echo "== $t =="; python3 "$t" || break; done
 ```
 
-The suite currently comprises **54 tests across 8 files**, and **all included
+The suite currently comprises **55 tests across 8 files**, and **all included
 tests currently pass**. (Counts are stated concretely; the project avoids
 absolute-coverage percentage phrasing.)
 
@@ -223,6 +227,15 @@ and should not be committed. `.gitignore` excludes:
 
 If you want to ship a fixed, intentional example set, place curated copies under
 `examples/` (which is tracked) rather than `exports/` (which is ignored).
+
+---
+
+## Public demo and /exports
+
+The `/exports` files are intentionally public for demo reproducibility. They
+contain synthetic demo artifacts and a throwaway, freshly generated demo trust
+root. They are **NOT** production keys, **NOT** production PKI, and **NOT**
+security credentials. Do not reuse this setup in production.
 
 ---
 
