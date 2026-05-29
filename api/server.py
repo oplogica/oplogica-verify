@@ -180,15 +180,55 @@ def _meaning_block(n_passed: int) -> dict[str, str]:
 
 
 # ----------------------------------------------------------------------
-# Optional: serve the local static dashboard from the SAME origin so the UI
-# can call /health and /verify without CORS. This is the only "server change"
-# and it is purely additive: if the ui/ directory is absent, nothing mounts and
-# the API behaves exactly as before. It serves static files only — no database,
-# no auth, no deployment. The dashboard is mounted at /ui to keep the API
-# routes (/health, /verify) unambiguous.
+# Static mounts for the LOCAL demo only.
+#
+# Both mounts are purely additive: if a directory is absent, nothing mounts and
+# the API behaves exactly as before. They serve static files only — no database,
+# no auth, no deployment. /verify behavior, request-supplied trust-root
+# handling, and reconciled output are all unchanged.
+#
+# /exports serves the generated demo artifacts (clean_bundle.json, registry.json,
+# trust_root.json, input_data.json, tampered_*.json, the report, the manifest)
+# so the local dashboard can populate its fields from the same origin.
+#
+# LOCAL DEMO CONVENIENCE ONLY. /exports exposes generated files (including a
+# demo trust root) directly over HTTP. Do NOT expose this mount publicly without
+# review: it is intended for a developer running the demo on 127.0.0.1.
+#
+# The /exports mount sends no-store cache headers. This matters because every
+# run of run_demo.py bootstraps a fresh trust anchor, so the artifacts are
+# internally consistent only WITHIN a single generation. Browser caching of a
+# stale registry.json or trust_root.json across regenerations would let the
+# dashboard POST a cross-generation pair (registry from one run, trust root from
+# another), which the engine correctly rejects as registry_signature_valid
+# failure. no-store prevents that stale-mix.
 # ----------------------------------------------------------------------
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import Response
+
+
+class NoCacheStaticFiles(StaticFiles):
+    """StaticFiles that disables client/proxy caching.
+
+    Used for /exports so the dashboard always fetches the current generation
+    of demo artifacts rather than a stale cached copy from an earlier
+    run_demo.py invocation.
+    """
+
+    def file_response(self, *args: Any, **kwargs: Any) -> Response:
+        resp = super().file_response(*args, **kwargs)
+        resp.headers["Cache-Control"] = "no-store, max-age=0"
+        return resp
+
+
 _UI_DIR = os.path.join(_ROOT, "ui")
 if os.path.isdir(_UI_DIR):
-    from fastapi.staticfiles import StaticFiles
-
     app.mount("/ui", StaticFiles(directory=_UI_DIR, html=True), name="ui")
+
+_EXPORTS_DIR = os.path.join(_ROOT, "exports")
+if os.path.isdir(_EXPORTS_DIR):
+    app.mount(
+        "/exports",
+        NoCacheStaticFiles(directory=_EXPORTS_DIR),
+        name="exports",
+    )
