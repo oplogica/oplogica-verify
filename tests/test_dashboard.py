@@ -219,6 +219,37 @@ def test_exports_datapath_verifies_valid_and_is_no_store():
     }, f"unexpected counts: {res.get('counts')}")
 
 
+def test_v02_labels_present_in_ui():
+    """The dashboard JS must render the v0.2 feature labels."""
+    js = _read(APPJS)
+    for label in ("Oplogica v0.2 active",
+                  "Negative Claims Firewall",
+                  "Verification Discipline",
+                  "L3 Failure Taxonomy"):
+        _assert(label in js, f"v0.2 label missing from UI: {label!r}")
+
+
+def test_v02_renders_response_fields():
+    """The UI must read the additive v0.2 response fields."""
+    js = _read(APPJS)
+    for field in ("verification_discipline", "l3_taxonomy", "firewall",
+                  "l3_failure_classification", "renderV02"):
+        _assert(field in js, f"v0.2 field/handler missing from UI: {field!r}")
+
+
+def test_v02_uses_safe_wording_only():
+    """v0.2 UI wording must use bounded, non-overclaiming phrasing."""
+    js = _read(APPJS).lower()
+    # Safe disclaimers we expect.
+    for safe in ("does not prove decision correctness",
+                 "does not certify compliance",
+                 "no llm interpretation"):
+        _assert(safe in js, f"expected safe v0.2 wording missing: {safe!r}")
+    # And none of the always-banned affirmative phrases.
+    for bad in BANNED_ALWAYS:
+        _assert(bad not in js, f"v0.2 UI contains banned phrase: {bad!r}")
+
+
 def _run_all():
     tests = [
         test_dashboard_files_exist,
@@ -229,6 +260,9 @@ def _run_all():
         test_reproduction_commands_present,
         test_static_mount_serves_dashboard,
         test_exports_datapath_verifies_valid_and_is_no_store,
+        test_v02_labels_present_in_ui,
+        test_v02_renders_response_fields,
+        test_v02_uses_safe_wording_only,
     ]
     failures = []
     for fn in tests:

@@ -247,3 +247,75 @@ The Apache-2.0 license covers the code only. It does **not** grant rights to the
 "OpLogica" or "OVA" names, logos, or other brand or trademark assets (see
 `NOTICE`). Using the code does not imply affiliation with or endorsement by
 OpLogica Inc.
+
+
+## Oplogica v0.2 Scope
+
+v0.2 is a narrow, additive extension of the v0.1 demo. It does not change the
+verifier, the trust model, or any existing API field. It adds three disciplined
+layers on top of the existing `verify -> reconcile` path.
+
+**What v0.2 adds**
+
+- **Negative Claims Firewall** (`ova_demo/negative_claims_firewall.py`). A
+  deterministic guard that scans Oplogica's *own* generated output (API framing
+  text, UI labels, reports) for overclaiming language and refuses to let it
+  pass. It catches affirmative claims such as "proves compliance" or an
+  unqualified "compliant", while allowing honest negated disclaimers such as
+  "does not certify compliance". It never inspects or judges user-provided
+  bundle content, and it uses no model — only a fixed term list and
+  clause-local negation handling.
+- **L3 Coherence Failure Taxonomy** (`ova_demo/l3_failure_taxonomy.py`). For
+  each failed or not-run check, it assigns a fixed failure class (for example
+  `ghost_evidence_reference`, `hash_mismatch`, `declared_check_not_run`) with a
+  reviewer-facing explanation, an explicit "means" and "does not prove", and
+  flags for whether it is deterministic and detectable from the bundle alone. It
+  operates only on the structured check results already produced by
+  reconciliation. It never interprets free text and never asserts that a
+  decision is correct or flawed.
+- **Deterministic Post-Hoc Verification Discipline**
+  (`ova_demo/verification_discipline.py`). A fixed metadata block attached to
+  each result, stating in machine-readable form that checks are recomputed from
+  the signed bundle, that no model interpretation is used, and that the result
+  does not verify decision correctness, certify compliance, establish fairness,
+  or detect silent omissions.
+
+**What it does not prove**
+
+v0.2 does not establish that an AI decision is correct, fair, lawful, or
+clinically valid. A failure means the recorded evidence cannot support
+independent review of the affected item — not that the underlying decision is
+sound or flawed.
+
+**Why no LLM interpretation is used**
+
+Every v0.2 check is deterministic: the same input always yields the same result,
+recomputed from the signed bundle and structured fields. Introducing a model to
+interpret free text would make the verification layer itself unverifiable, which
+would defeat the purpose.
+
+**Why this is not a compliance certificate**
+
+The verification-discipline block sets `is_compliance_certificate: false` and
+`certifies_compliance: false`. Oplogica supports independent review and
+tamper-evidence; it does not issue compliance determinations.
+
+**Why this is not a new standard**
+
+`is_a_standard: false`. v0.2 is a reference implementation of disciplined
+overclaim prevention and structured failure classification on top of existing
+prior art (audit logging, claim-evidence verification, assertibility
+boundaries). It does not claim to define a standard.
+
+**Reproduce the tests**
+
+This project does not use pytest; each test file has its own runner.
+
+```bash
+python3 tests/test_negative_claims_firewall.py
+python3 tests/test_l3_failure_taxonomy.py
+python3 tests/test_verification_discipline.py
+python3 tests/test_api.py
+# or run the whole suite:
+for t in tests/test_*.py; do echo "== $t =="; python3 "$t" || break; done
+```

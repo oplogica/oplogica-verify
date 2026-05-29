@@ -42,6 +42,9 @@ if _ROOT not in sys.path:
 
 from ova_engine import ova_v2 as engine
 from ova_demo.checks import ALL_CHECKS, reconcile
+from ova_demo.l3_failure_taxonomy import classify as l3_classify
+from ova_demo.verification_discipline import discipline_block
+from ova_demo import negative_claims_firewall as firewall
 
 
 # ----------------------------------------------------------------------
@@ -149,7 +152,7 @@ def verify(req: VerifyRequest) -> dict[str, Any]:
 
     rec = reconcile(raw)
 
-    return {
+    response = {
         "status": rec["status"],
         "passed": rec["passed"],
         "failed": rec["failed"],
@@ -168,6 +171,35 @@ def verify(req: VerifyRequest) -> dict[str, Any]:
         "scope_warning": SCOPE_WARNING,
         "input_data_provided": req.input_data is not None,
     }
+
+    # ---- v0.2 additive fields (do not alter any v0.1 field above) ----
+    # L3 coherence-failure taxonomy: names the KIND of each failure, with
+    # explicit "means" / "does_not_prove" and detectability flags.
+    response["l3_taxonomy"] = l3_classify(rec)
+    # Verification discipline: fixed, machine-readable scope posture.
+    response["verification_discipline"] = discipline_block()
+
+    # ---- Negative Claims Firewall: final guard on Oplogica's OWN output ----
+    # We scan the assembled response for overclaim language in system-generated
+    # text. Findings are surfaced (not silently dropped) so the guard is
+    # auditable. The fixed not-meaning sentence uses negated phrasing and is
+    # therefore not flagged. This never inspects user-provided bundle content.
+    response["firewall"] = {
+        "applied": True,
+        "scope": "system-generated output only",
+        "findings": firewall.scan_mapping(
+            {
+                k: v
+                for k, v in response.items()
+                # Do not scan the echoed user inputs / raw check reasons, which
+                # are not Oplogica's own assertions; scope the guard to our
+                # generated framing text.
+                if k in ("meaning_block", "scope_warning", "verification_discipline")
+            }
+        ),
+    }
+
+    return response
 
 
 def _meaning_block(n_passed: int) -> dict[str, str]:

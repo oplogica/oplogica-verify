@@ -167,29 +167,6 @@ button.secondary {
 }
 button.secondary:hover { background: var(--green-tint); }
 
-/* Amber/warning button — used for actions that intentionally break the bundle
-   (e.g. Apply T4 tamper). Communicates "this is a destructive demo step";
-   wiring and id are unchanged. */
-button.warn {
-  background: var(--warn-bg);
-  color: #6B4E10;
-  border: 1px solid var(--warn-line);
-}
-button.warn:hover { background: #F7E6B6; }
-
-/* Short, visible instruction note — used near input/button rows and near the
-   public-artifacts area. Distinct from .lead (which is the section intro) and
-   .footnote (which is small print). */
-.instruction {
-  background: var(--warn-bg);
-  border-left: 3px solid var(--warn-line);
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin: 10px 0;
-  font-size: 13px;
-  color: #5B4A1A;
-}
-
 /* ---- Result ---- */
 .result { margin-top: 16px; }
 .status-pill {
@@ -267,3 +244,40 @@ pre.cmd .c { color: #6FB69C; }
 
 .footnote { color: var(--muted); font-size: 12px; margin-top: 10px; }
 hr.soft { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+
+/* ---- Oplogica v0.2 display blocks (additive) ---- */
+.v02-section { margin-top: 14px; }
+.v02-section > h3 { color: var(--green-deep); margin: 18px 0 8px; }
+.v02-h { font-size: 15px; color: var(--green-deep); margin: 16px 0 6px; }
+.v02-card {
+  border: 1px solid var(--line);
+  background: var(--green-tint);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.v02-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 14px; color: var(--ink); }
+.v02-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); display: inline-block; }
+.v02-dot.ok { background: var(--pass); }
+.v02-disc { list-style: none; padding: 0; margin: 0; }
+.v02-li { padding: 3px 0; font-size: 14px; color: var(--ink); }
+.v02-mark { color: var(--pass); font-weight: 700; margin-right: 8px; }
+.v02-clean { font-size: 14px; color: var(--muted); margin: 4px 0; }
+.v02-taxlist, .v02-warnlist { list-style: none; padding: 0; margin: 6px 0; }
+.v02-fail {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--fail);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 6px 0;
+}
+.v02-chk { color: var(--muted); font-size: 13px; }
+.v02-means { font-size: 13px; color: var(--ink); margin-top: 4px; }
+.v02-dnp { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.v02-warn {
+  border: 1px solid var(--warn-line);
+  background: var(--warn-bg);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin: 4px 0;
+  font-size: 13px;
+}

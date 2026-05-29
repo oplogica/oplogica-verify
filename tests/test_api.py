@@ -242,6 +242,56 @@ def test_malformed_bundle_returns_controlled_error():
     _assert(body["counts"]["checks_total"] == len(ALL_CHECKS), body)
 
 
+def test_v02_additive_fields_present_and_v01_preserved():
+    """v0.2 adds l3_taxonomy, verification_discipline, firewall — additively."""
+    clean_payload, _ = _make_payloads()
+    body = client.post("/verify", json=clean_payload).json()
+    for k in ("status", "passed", "failed", "not_run", "counts",
+              "meaning_block", "scope_warning"):
+        _assert(k in body, f"v0.1 field dropped: {k}")
+    _assert(body["status"] == "VALID", "clean must still be VALID")
+    for k in ("l3_taxonomy", "verification_discipline", "firewall"):
+        _assert(k in body, f"v0.2 field missing: {k}")
+    vd = body["verification_discipline"]
+    _assert(vd["deterministic"] is True, vd)
+    _assert(vd["uses_llm_interpretation"] is False, vd)
+    _assert(vd["verifies_decision_correctness"] is False, vd)
+    _assert(vd["detects_silent_omission"] is False, vd)
+    _assert(body["l3_taxonomy"]["l3_failure_classification"] == [],
+            "clean bundle should have no L3 failures")
+
+
+def test_v02_t4_taxonomy_classifies_failures():
+    _, t4_payload = _make_payloads()
+    body = client.post("/verify", json=t4_payload).json()
+    classes = {e["check"]: e["failure_class"]
+               for e in body["l3_taxonomy"]["l3_failure_classification"]}
+    _assert(classes.get("por_structural_consistency") == "ghost_evidence_reference",
+            classes)
+    _assert(classes.get("merkle_root_match") == "hash_mismatch", classes)
+    _assert(classes.get("por_signature_binding_valid") == "declared_check_not_run",
+            classes)
+    note = body["l3_taxonomy"]["scope_boundary_note"]
+    _assert(note["detectable_from_bundle_alone"] is False, note)
+
+
+def test_v02_api_payload_is_firewall_clean():
+    """System-generated framing text in the response must not overclaim."""
+    from ova_demo import negative_claims_firewall as fw
+    clean_payload, _ = _make_payloads()
+    body = client.post("/verify", json=clean_payload).json()
+    _assert(body["firewall"]["findings"] == [],
+            f"server firewall flagged its own output: {body['firewall']['findings']}")
+    generated = {
+        "meaning_block": body["meaning_block"],
+        "scope_warning": body["scope_warning"],
+        "verification_discipline": body["verification_discipline"],
+        "l3_taxonomy": body["l3_taxonomy"],
+    }
+    findings = fw.scan_mapping(generated)
+    _assert(findings == [], f"v0.2 generated text overclaims: {findings}")
+
+
 def _run_all():
     tests = [
         test_health,
@@ -251,6 +301,9 @@ def _run_all():
         test_no_banned_terms_outside_not_meaning,
         test_no_raw_checks_total_exposed_as_authoritative,
         test_malformed_bundle_returns_controlled_error,
+        test_v02_additive_fields_present_and_v01_preserved,
+        test_v02_t4_taxonomy_classifies_failures,
+        test_v02_api_payload_is_firewall_clean,
     ]
     failures = []
     for fn in tests:
