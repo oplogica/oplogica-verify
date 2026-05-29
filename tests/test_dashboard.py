@@ -250,6 +250,19 @@ def test_v02_uses_safe_wording_only():
         _assert(bad not in js, f"v0.2 UI contains banned phrase: {bad!r}")
 
 
+def test_export_paths_are_prefix_aware():
+    """app.js must derive export/API paths from the page prefix, not hardcode
+    domain-root /exports, so the dashboard works under /ova-demo/ui/ too."""
+    js = _read(APPJS)
+    _assert("APP_PREFIX" in js, "APP_PREFIX missing — paths not prefix-aware")
+    _assert("EXPORT_BASE" in js, "EXPORT_BASE missing — paths not prefix-aware")
+    _assert("/ui" in js, "prefix derivation from /ui not present")
+    _assert('"/exports/clean_bundle.json"' not in js,
+            "hardcoded absolute /exports path still present")
+    _assert('const API_BASE = "";' not in js,
+            "API_BASE is still hardcoded empty; not prefix-aware")
+
+
 def _run_all():
     tests = [
         test_dashboard_files_exist,
@@ -263,6 +276,7 @@ def _run_all():
         test_v02_labels_present_in_ui,
         test_v02_renders_response_fields,
         test_v02_uses_safe_wording_only,
+        test_export_paths_are_prefix_aware,
     ]
     failures = []
     for fn in tests:

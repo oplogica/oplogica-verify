@@ -19,15 +19,25 @@
 
 const $ = (id) => document.getElementById(id);
 
-// ---- API base. Same-origin by default (served by FastAPI static mount). ----
-const API_BASE = "";
+// ---- API base. Same-origin, prefix-aware. ----
+// When served under a reverse-proxy prefix (e.g. /ova-demo/ui/), the API lives
+// at the same prefix (/ova-demo/health, /ova-demo/verify). Derive it from the
+// page path so /health and /verify resolve in both root and prefixed setups.
+const API_BASE = window.location.pathname.replace(/\/ui\/?$/, "");
 
-// Demo artifact locations on the API's /exports mount (absolute, same-origin).
+// Demo artifact locations on the API's /exports mount.
+// The UI may be served at the domain root ("/ui/") or under a reverse-proxy
+// prefix ("/ova-demo/ui/"). Derive the app prefix from the current page path so
+// the exports resolve correctly in both cases:
+//   /ui/           -> /exports/...
+//   /ova-demo/ui/  -> /ova-demo/exports/...
+const APP_PREFIX = window.location.pathname.replace(/\/ui\/?$/, "");
+const EXPORT_BASE = `${APP_PREFIX}/exports`;
 const EXPORT_FILES = {
-  bundle: "/exports/clean_bundle.json",
-  registry: "/exports/registry.json",
-  trust_root: "/exports/trust_root.json",
-  input_data: "/exports/input_data.json",
+  bundle: `${EXPORT_BASE}/clean_bundle.json`,
+  registry: `${EXPORT_BASE}/registry.json`,
+  trust_root: `${EXPORT_BASE}/trust_root.json`,
+  input_data: `${EXPORT_BASE}/input_data.json`,
 };
 
 // ---- Health check ----
