@@ -5,13 +5,9 @@
 
    Demo inputs are loaded from the API's /exports static mount (no-store), so a
    single consistent generation is always fetched. Before POSTing, verify()
-   runs two pre-flight checks to catch a cross-generation mix early:
+   runs one pre-flight check to catch a cross-generation mix early:
      1. the bundle's embedded registry hash must be in
-        trust_root.allowed_registry_hashes;
-     2. a client-computed canonical hash of the loaded registry must also be in
-        trust_root.allowed_registry_hashes. The canonical hash mirrors the
-        engine's registry hash (drop registry_signature and _self_hash, sort
-        keys recursively, compact separators, SHA-256, "sha256:" prefix).
+        trust_root.allowed_registry_hashes (a direct string comparison).
    The server still performs the authoritative check; the pre-flight only turns a
    confusing server INVALID into a precise client message. */
 
@@ -157,87 +153,13 @@ function parseField(id, required) {
 }
 
 // ----------------------------------------------------------------------
-// Client-side canonical registry hash, mirroring the engine:
-//   payload = registry without "registry_signature" and "_self_hash"
-//   bytes   = canonical-JSON(payload): keys sorted recursively, compact
-//             separators (",",":"), original numeric lexemes preserved
-//   hash    = "sha256:" + sha256_hex(bytes)
-//
-// Number handling: the registry contains float values such as 1.0, which
-// Python's json.dumps renders as "1.0". JSON.parse loses the int/float
-// distinction (1.0 -> 1), so we preserve the ORIGINAL numeric text using the
-// ES2023 source-text reviver when available. If the runtime does not support
-// it, we cannot reproduce whole-float formatting exactly, so we DO NOT compute
-// this hash (and skip check #2) rather than report a false mismatch. Pre-flight
-// check #1 still guards the cross-generation case, and the server remains
-// authoritative.
+// Note: the browser previously recomputed a canonical registry hash to mirror
+// the engine. That logic was removed because reproducing the engine's exact
+// canonical-JSON form across runtimes is unreliable and produced false
+// negatives. The server is the authoritative verifier; the UI only checks the
+// bundle's embedded registry hash (a direct string comparison) as a courtesy
+// pre-flight.
 // ----------------------------------------------------------------------
-
-// Returns [parsedWithRawNumbers, numbersPreserved].
-function parsePreservingNumbers(text) {
-  try {
-    let usedSource = false;
-    const parsed = JSON.parse(text, function (key, val, ctx) {
-      if (typeof val === "number" && ctx && typeof ctx.source === "string") {
-        usedSource = true;
-        return { __raw_num__: ctx.source };
-      }
-      return val;
-    });
-    return [parsed, usedSource];
-  } catch (e) {
-    return [JSON.parse(text), false];
-  }
-}
-
-function canonicalize(v) {
-  if (v === null) return "null";
-  if (
-    typeof v === "object" &&
-    v !== null &&
-    !Array.isArray(v) &&
-    Object.prototype.hasOwnProperty.call(v, "__raw_num__") &&
-    Object.keys(v).length === 1
-  ) {
-    return v.__raw_num__; // original numeric lexeme, e.g. "1.0" or "2"
-  }
-  if (typeof v === "number") return String(v);
-  if (typeof v === "boolean") return v ? "true" : "false";
-  if (typeof v === "string") return JSON.stringify(v);
-  if (Array.isArray(v)) return "[" + v.map(canonicalize).join(",") + "]";
-  if (typeof v === "object") {
-    const keys = Object.keys(v).sort();
-    return (
-      "{" +
-      keys
-        .map((k) => JSON.stringify(k) + ":" + canonicalize(v[k]))
-        .join(",") +
-      "}"
-    );
-  }
-  throw new Error("unsupported value type in canonicalize");
-}
-
-// Computes the engine-compatible registry hash from the registry's raw JSON
-// TEXT (so numeric lexemes are preserved). Returns null if the runtime can't
-// preserve numbers or SubtleCrypto is unavailable.
-async function registryHashFromText(registryText) {
-  const [obj, preserved] = parsePreservingNumbers(registryText);
-  if (!preserved) return null;
-  if (!(window.crypto && window.crypto.subtle)) return null;
-  const payload = {};
-  for (const k of Object.keys(obj)) {
-    if (k === "registry_signature" || k === "_self_hash") continue;
-    payload[k] = obj[k];
-  }
-  const canonical = canonicalize(payload);
-  const bytes = new TextEncoder().encode(canonical);
-  const digest = await window.crypto.subtle.digest("SHA-256", bytes);
-  const hex = Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return "sha256:" + hex;
-}
 
 // ---- Verify ----
 async function verify() {
@@ -277,28 +199,15 @@ async function verify() {
     return;
   }
 
-  // Pre-flight #2: the client-computed canonical hash of the registry must be
-  // allowed (skipped if the runtime cannot preserve numeric formatting).
-  try {
-    const registryText = $("registry").value;
-    const computed = await registryHashFromText(registryText);
-    if (computed !== null && allowed.length && !allowed.includes(computed)) {
-      showError(
-        "Inputs are from different demo generations. The registry's computed " +
-          "hash is not in trust_root.allowed_registry_hashes.\n" +
-          "  computed registry hash: " +
-          computed +
-          "\n  allowed: " +
-          allowed.join(", ") +
-          "\nRe-run `python3 ova_demo/run_demo.py --out ./exports`, then click " +
-          "'Load demo clean inputs' again before Verify."
-      );
-      return;
-    }
-  } catch (e) {
-    // A pre-flight computation error must not block the authoritative server
-    // check; fall through to POST.
-  }
+  // Note: a previous pre-flight recomputed a canonical registry hash in the
+  // browser and compared it to trust_root.allowed_registry_hashes. That check
+  // is intentionally removed: reproducing the engine's exact canonical-JSON
+  // form (key ordering, numeric lexemes, ASCII escaping) in the browser is not
+  // reliable across runtimes, and a mismatch there produced a false negative
+  // even when the server verified the same inputs as VALID. Pre-flight #1
+  // (the bundle's embedded registry hash, a direct string comparison) still
+  // guards the cross-generation case, and the server remains the authoritative
+  // verifier of every check, signature, and hash.
 
   // Build the POST payload from the parsed visible textareas only.
   const payload = { bundle, registry, trust_root };
