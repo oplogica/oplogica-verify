@@ -2,7 +2,7 @@
 
 **Live demo:** https://oplogica.com/ova-demo/
 
-TODO: Add dashboard screenshot/GIF before broad public launch.
+![OVA dashboard — clean bundle VALID and T4 tamper INVALID](docs/screenshot.png)
 
 OVA (the OpLogica Verification Architecture) generates a cryptographically
 verifiable **evidence bundle** for a governance-bound AI decision and lets
