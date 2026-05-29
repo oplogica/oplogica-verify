@@ -284,6 +284,34 @@ def test_export_loads_are_cache_busted():
             "browser-side canonical registry hash recompute was reintroduced")
 
 
+def test_exports_loaded_as_raw_text_and_posted_verbatim():
+    """The UI must preserve the exact raw JSON bytes of each export.
+
+    Reparsing with r.json() and reserializing with JSON.stringify normalizes
+    numeric lexemes (1.0 -> 1), changing the registry representation the server
+    hashes and producing a false INVALID. So exports must be loaded as text and
+    the verify POST body must be spliced from the raw textarea strings."""
+    js = _read(APPJS)
+    # Loaded as raw text, not parsed-and-reserialized.
+    _assert("await r.text()" in js, "exports not loaded via r.text()")
+    _assert("loaded[field] = await r.json()" not in js,
+            "exports still loaded via r.json() (would normalize numbers)")
+    _assert("$(field).value = JSON.stringify(obj, null, 2)" not in js,
+            "loaded exports are still reserialized with JSON.stringify")
+    # verify() builds the POST body from raw textarea strings.
+    _assert("rawBundle" in js and "rawRegistry" in js and "rawTrustRoot" in js,
+            "verify POST body is not built from raw textarea strings")
+    _assert("requestBody" in js, "verify does not build a raw requestBody string")
+    _assert("body: JSON.stringify(payload)" not in js,
+            "verify still posts a reserialized payload (would normalize numbers)")
+    # Guards preserved.
+    _assert("loadNonce" in js, "cache-busting loadNonce was lost")
+    _assert("EXPORT_BASE" in js and "APP_PREFIX" in js,
+            "prefix-aware export paths were lost")
+    _assert("parsePreservingNumbers" not in js,
+            "browser-side canonical registry hash recompute was reintroduced")
+
+
 def _run_all():
     tests = [
         test_dashboard_files_exist,
@@ -299,6 +327,7 @@ def _run_all():
         test_v02_uses_safe_wording_only,
         test_export_paths_are_prefix_aware,
         test_export_loads_are_cache_busted,
+        test_exports_loaded_as_raw_text_and_posted_verbatim,
     ]
     failures = []
     for fn in tests:

@@ -84,7 +84,13 @@ async function loadCleanInputs() {
         missing.push(path);
         continue;
       }
-      loaded[field] = await r.json();
+      // Preserve the exact bytes served. Reparsing with r.json() and later
+      // reserializing would normalize numeric lexemes (e.g. 1.0 -> 1), which
+      // changes the registry's JSON representation and therefore the hash the
+      // server recomputes — making an otherwise-VALID set verify as INVALID.
+      const text = await r.text();
+      JSON.parse(text); // validation only; the raw text is what we keep
+      loaded[field] = text;
     } catch (e) {
       missing.push(path);
     }
@@ -103,8 +109,9 @@ async function loadCleanInputs() {
     return;
   }
 
-  for (const [field, obj] of Object.entries(loaded)) {
-    $(field).value = JSON.stringify(obj, null, 2);
+  for (const [field, text] of Object.entries(loaded)) {
+    // Write the raw served text verbatim — do not pretty-print/reserialize.
+    $(field).value = text;
   }
 
   showNote(
@@ -219,15 +226,29 @@ async function verify() {
   // guards the cross-generation case, and the server remains the authoritative
   // verifier of every check, signature, and hash.
 
-  // Build the POST payload from the parsed visible textareas only.
-  const payload = { bundle, registry, trust_root };
-  if (input_data !== null) payload.input_data = input_data;
+  // Build the POST body from the RAW textarea strings, not from reserialized
+  // objects. parseField above already validated each field is well-formed JSON
+  // and supplied the parsed values for pre-flight #1. Re-stringifying those
+  // objects would normalize numeric lexemes (1.0 -> 1) and re-order/escape
+  // keys, changing the registry representation the server hashes. Splicing the
+  // raw strings preserves the exact bytes the server reads from disk.
+  const rawBundle = $("bundle").value.trim();
+  const rawRegistry = $("registry").value.trim();
+  const rawTrustRoot = $("trust_root").value.trim();
+  const rawInputData = $("input_data").value.trim();
+
+  let requestBody =
+    `{"bundle":${rawBundle},"registry":${rawRegistry},"trust_root":${rawTrustRoot}`;
+  if (rawInputData) {
+    requestBody += `,"input_data":${rawInputData}`;
+  }
+  requestBody += "}";
 
   try {
     const r = await fetch(`${API_BASE}/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: requestBody,
     });
     const body = await r.json();
     renderResult(body);
