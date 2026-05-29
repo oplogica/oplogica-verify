@@ -162,6 +162,63 @@ def test_static_mount_serves_dashboard():
     _assert(h.status_code == 200, "/health broke after mounting ui")
 
 
+def test_exports_datapath_verifies_valid_and_is_no_store():
+    """End-to-end regression for the dashboard data path.
+
+    Reproduces exactly what the dashboard does: generate one consistent
+    ./exports set, fetch all four files via the app's /exports route, POST the
+    fetched JSON to /verify, and expect a reconciled VALID 13/0/0. Also checks
+    that /exports responses carry a no-store Cache-Control header (the fix that
+    prevents a stale cross-generation file mix).
+
+    Note: api.server mounts /exports at import time only if ./exports exists, so
+    we generate the set BEFORE importing the app.
+    """
+    import os
+    import json
+    from ova_demo import run_demo
+
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    exports_dir = os.path.join(root, "exports")
+    # Generate one internally consistent generation.
+    run_demo.run(exports_dir)
+
+    from fastapi.testclient import TestClient
+    from api.server import app
+
+    client = TestClient(app)
+
+    files = [
+        "clean_bundle.json",
+        "registry.json",
+        "trust_root.json",
+        "input_data.json",
+    ]
+    loaded = {}
+    for f in files:
+        r = client.get(f"/exports/{f}")
+        _assert(r.status_code == 200, f"/exports/{f} -> {r.status_code}")
+        loaded[f] = r.json()
+
+    # /exports must be no-store (verified on the clean bundle response).
+    cb = client.get("/exports/clean_bundle.json")
+    cache_header = cb.headers.get("cache-control", "")
+    _assert("no-store" in cache_header.lower(),
+            f"/exports/clean_bundle.json missing no-store: {cache_header!r}")
+
+    body = {
+        "bundle": loaded["clean_bundle.json"],
+        "registry": loaded["registry.json"],
+        "trust_root": loaded["trust_root.json"],
+        "input_data": loaded["input_data.json"],
+    }
+    res = client.post("/verify", json=body).json()
+    _assert(res["status"] == "VALID", f"expected VALID, got {res.get('status')}")
+    _assert(res["counts"] == {
+        "passed": 13, "failed": 0, "not_run": 0, "checks_total": 13
+    }, f"unexpected counts: {res.get('counts')}")
+
+
 def _run_all():
     tests = [
         test_dashboard_files_exist,
@@ -171,6 +228,7 @@ def _run_all():
         test_t4_failed_and_not_run_checks_named,
         test_reproduction_commands_present,
         test_static_mount_serves_dashboard,
+        test_exports_datapath_verifies_valid_and_is_no_store,
     ]
     failures = []
     for fn in tests:
