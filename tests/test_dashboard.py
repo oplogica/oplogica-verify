@@ -263,6 +263,27 @@ def test_export_paths_are_prefix_aware():
             "API_BASE is still hardcoded empty; not prefix-aware")
 
 
+def test_export_loads_are_cache_busted():
+    """Demo export fetches must be cache-busted per Load so the browser/proxy
+    cannot reuse a stale or mixed export generation (which would make the server
+    correctly verify the inputs as INVALID)."""
+    js = _read(APPJS)
+    # A per-load nonce (Date.now) appended as a query token to each fetch.
+    _assert("Date.now" in js, "no per-load nonce (Date.now) for export fetches")
+    _assert("loadNonce" in js, "loadNonce token not used for export fetches")
+    _assert("v=${loadNonce}" in js, "export fetch URL does not append the load nonce")
+    # No-store / no-cache request semantics retained.
+    _assert('cache: "no-store"' in js, 'export fetch missing cache: "no-store"')
+    _assert("Cache-Control" in js, "export fetch missing Cache-Control: no-cache header")
+    # Prefix-aware export plumbing must remain intact.
+    _assert("EXPORT_FILES" in js, "EXPORT_FILES missing")
+    _assert("APP_PREFIX" in js, "APP_PREFIX missing — prefix-aware paths lost")
+    _assert("EXPORT_BASE" in js, "EXPORT_BASE missing — prefix-aware paths lost")
+    # The fragile browser-side canonical registry hash recompute must NOT return.
+    _assert("parsePreservingNumbers" not in js,
+            "browser-side canonical registry hash recompute was reintroduced")
+
+
 def _run_all():
     tests = [
         test_dashboard_files_exist,
@@ -277,6 +298,7 @@ def _run_all():
         test_v02_renders_response_fields,
         test_v02_uses_safe_wording_only,
         test_export_paths_are_prefix_aware,
+        test_export_loads_are_cache_busted,
     ]
     failures = []
     for fn in tests:

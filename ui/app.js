@@ -67,9 +67,19 @@ async function loadCleanInputs() {
   const loaded = {};
   const missing = [];
 
+  // One cache-busting token per Load action, shared by all four files so they
+  // come from a single, consistent export generation. This defeats any browser
+  // or proxy cache that might otherwise serve a stale/mixed export set (which
+  // would make the server correctly verify the inputs as INVALID).
+  const loadNonce = Date.now().toString();
+
   for (const [field, path] of Object.entries(EXPORT_FILES)) {
     try {
-      const r = await fetch(path, { cache: "no-store" });
+      const url = `${path}${path.includes("?") ? "&" : "?"}v=${loadNonce}`;
+      const r = await fetch(url, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
       if (!r.ok) {
         missing.push(path);
         continue;
