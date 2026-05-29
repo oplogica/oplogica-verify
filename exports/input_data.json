@@ -1,0 +1,8 @@
+{
+  "patient_id": "pt-anon-2026-05-20-001",
+  "vital_score": 0.38,
+  "life_threatening": true,
+  "wait_minutes_at_decision": 12,
+  "demographic_group": "protected_group_A",
+  "age": 72
+}
