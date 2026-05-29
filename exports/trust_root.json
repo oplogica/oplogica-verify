@@ -2,8 +2,8 @@
   "_comment": "DEMO trust anchor only. Not HSM-backed, not production PKI, no claim of resistance to key compromise. Generated for this demo run and shipped to the verifier independently of any bundle. The verifier pins to this file, NOT to a root recovered from the registry under inspection.",
   "signature_scheme": "Ed25519-prototype-2026",
   "production_target": "ML-DSA (Dilithium-III, FIPS 204) — not implemented",
-  "trusted_root_public_key": "Ed25519-prototype-2026-pub:d3fc6eb34a277855e1e3e231342d42e6e5494587514b0306d2bacd14f78bd92f",
+  "trusted_root_public_key": "Ed25519-prototype-2026-pub:d624e531ef6637a087552cbbfe260c429a328f284c4705cc211d9ba76c252c5f",
   "allowed_registry_hashes": [
-    "sha256:d05a0dd32643ba229db0e8415e04509211dffae9945f3798b0a78888dc75f2d7"
+    "sha256:6ff700577bf45f285c129d8716f0a6f32a355dc64ce22f172f916300de01baca"
   ]
 }

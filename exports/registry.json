@@ -12,27 +12,27 @@
     "regulator-MOH-TR-01": {
       "role": "REGULATOR",
       "canonical_vote_weight": 1.0,
-      "public_key": "Ed25519-prototype-2026-pub:ab5336910bb6dcb81497bdda6d1ffa572491f8be59227da919d6304df03e7a6c"
+      "public_key": "Ed25519-prototype-2026-pub:da0393eb534e6fac17ae2834d74268aa6f0690fae4ef5bb7cc62506d9083ea20"
     },
     "ethics-board-IST-04": {
       "role": "ETHICS_BOARD",
       "canonical_vote_weight": 1.0,
-      "public_key": "Ed25519-prototype-2026-pub:461941ec2221ff101bedc582dcc7a949aee61cddfa32d0c4840848ca0bf1cbe8"
+      "public_key": "Ed25519-prototype-2026-pub:195e95c3816ef26179bb7620767c6e97c550909449f0d7078ec7c22bbab11b53"
     },
     "domain-expert-EM-12": {
       "role": "DOMAIN_EXPERT",
       "canonical_vote_weight": 0.8,
-      "public_key": "Ed25519-prototype-2026-pub:e637c49170091bb58fbb44fe66f8ef92107cdae930230151b3b540dfd5f21868"
+      "public_key": "Ed25519-prototype-2026-pub:11bb9b90357557a01d8ec3ff938bf2dce153b8920f37d1595c1fbf4a084450cd"
     },
     "affected-rep-PA-03": {
       "role": "AFFECTED_PARTY_REP",
       "canonical_vote_weight": 0.6,
-      "public_key": "Ed25519-prototype-2026-pub:8a85c1a4243aa950c70deb42a92f1756e7ab618ae4730b8ffd72b260e03c4635"
+      "public_key": "Ed25519-prototype-2026-pub:ab91c089ed66a22c128ee93487a88ca45151bc7fbdaa774f985eaa56364a38a2"
     }
   },
   "authorized_operators": {
     "operator-istanbul-hospital-ER-01": {
-      "public_key": "Ed25519-prototype-2026-pub:228a04bfbee7419503641e5748350664e2d271d13f71557a9a3a2c4b9afa25cf"
+      "public_key": "Ed25519-prototype-2026-pub:6b5109d13b785257926f6c15c4a92b69bc8a6f0a392d6954c9970118922bbbfe"
     }
   },
   "allowed_votes": [
@@ -40,6 +40,6 @@
     "REJECT",
     "ABSTAIN"
   ],
-  "registry_root_public_key": "Ed25519-prototype-2026-pub:d3fc6eb34a277855e1e3e231342d42e6e5494587514b0306d2bacd14f78bd92f",
-  "registry_signature": "Ed25519-prototype-2026:7a82f0547502d31c548b40078b5d4e05f6d0e8447ec8d198304993eb95fe36e82bfbae851b318c0937bfaa7b148fbdc76d4801de48690b1d0b285163a471ac05"
+  "registry_root_public_key": "Ed25519-prototype-2026-pub:d624e531ef6637a087552cbbfe260c429a328f284c4705cc211d9ba76c252c5f",
+  "registry_signature": "Ed25519-prototype-2026:99cf2f98966801d0648d8d77e3e5251ef07bd034a40bf82d5dbb67387daf5a441d2b02dfe206ee82b6f2b6c8d1231f83deb38f7d261486996475bfe50a60440e"
 }

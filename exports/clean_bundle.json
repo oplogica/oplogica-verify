@@ -1,7 +1,7 @@
 {
   "bundle_id": "ova-test-2026-05-20-001",
   "framework_version": "OpLogica v2.5",
-  "timestamp_utc": "2026-05-29T22:11:49Z",
+  "timestamp_utc": "2026-05-29T22:54:25Z",
   "hash_algorithm": "SHA-256",
   "verification_scope": {
     "trust_chain_property": "OVA v2.5 establishes a multi-layered trust chain: (1) Trusted root: verifier pins TRUSTED_REGISTRY_ROOT_PUBLIC_KEY out-of-band. (2) Signed registry: any accepted registry must carry a registry_signature valid under the trusted root AND its content hash must be in the pinned ALLOWED_REGISTRY_HASHES. (3) Temporal validity: registry valid_from/valid_until must bracket the PoO decision_timestamp. (4) Registry-anchored participant keys: each PoN vote is signed by the participant; the verifier resolves the participant public key from the registry, not from the bundle. (5) Registry-anchored operator key: the operator's public key is resolved from registry.authorized_operators, not from PoO metadata. (6) Policy-content binding: vote signatures and PoO bind to policy_hash (content hash of constraints), not just symbolic version IDs. (7) Active policy binding: votes counted toward quorum must bind to the EXACT policy that PoO executes (same epoch_id, policy_version_id, and policy_hash). (8) Rule-policy binding (NEW v2.5): each rule in PoR carries policy_hash and constraint_hash. The verifier rejects rules whose constraint does not exist in the active policy or whose constraint_hash does not match the recomputed value. This establishes RULE PROVENANCE, not semantic execution compliance. (9) Cross-layer binding: PoR signature is computed over a payload that includes poo_anchor. PoR cannot be grafted across bundles. (10) Independent computation: all *_verified flags inside the bundle are ignored; everything is recomputed from primitives. (11) DAG + reachability: PoR is checked for cycles AND for every conclusion having a derivation path to at least one premise.",
@@ -50,7 +50,7 @@
     "pon": {
       "epoch_id": "epoch-2026-Q2",
       "negotiation_timestamp_t0": "2026-05-15T10:00:00Z",
-      "governance_registry_hash": "sha256:d05a0dd32643ba229db0e8415e04509211dffae9945f3798b0a78888dc75f2d7",
+      "governance_registry_hash": "sha256:6ff700577bf45f285c129d8716f0a6f32a355dc64ce22f172f916300de01baca",
       "votes": [
         {
           "participant_id": "regulator-MOH-TR-01",
@@ -59,7 +59,7 @@
           "policy_version_id_anchor": "CV_2",
           "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
           "vote_timestamp": "2026-05-15T10:00:00Z",
-          "signature": "Ed25519-prototype-2026:ebe29a5c02885838cd4c9b9d76f7c207aae0b68e2aa1bdca8915867e673139faeb55040703e56632e645352937eb14d4d5f4b1ce29a170194c7b842747124b04"
+          "signature": "Ed25519-prototype-2026:496b73111fb8670ed19520146fafbe61464fbb7367d16502fd3b848016ce8cb95261a7619408717dd0da4cf597ad0495d7ce03d6ec429ea805aa1fbfb8a54706"
         },
         {
           "participant_id": "ethics-board-IST-04",
@@ -68,7 +68,7 @@
           "policy_version_id_anchor": "CV_2",
           "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
           "vote_timestamp": "2026-05-15T10:00:00Z",
-          "signature": "Ed25519-prototype-2026:52d0f99019d4ab43c8ff7c3ad0dfc577647ea610d00b9757c3acce17ace5e9e20246812bd42472f1253c24a0c4b4d5aa270bca538ef5160887460db8aa1e910a"
+          "signature": "Ed25519-prototype-2026:27be6f3f014586d824e146e82e1b2eedb7e4a7b1e9a2c7999bc2938ba22b5ead358e2f2bde42b97a8da4be2b03b5dda48e32ce2c622fe1a44cea7bbd89179a06"
         },
         {
           "participant_id": "domain-expert-EM-12",
@@ -77,7 +77,7 @@
           "policy_version_id_anchor": "CV_2",
           "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
           "vote_timestamp": "2026-05-15T10:00:00Z",
-          "signature": "Ed25519-prototype-2026:3acc5528bda29f18ee9e0d955673a6c39bfb1640471c5803acaa2a12c89ef0afd098abca84eed023104b8b83212b2f7d7d5dc11c058aece45e260aaf7da9750e"
+          "signature": "Ed25519-prototype-2026:97179bda8623f9c1dfde0a8de95cbf5075a58a51fda8b1f98aa5cad4e1683a0e1418c13a5c1b3c9f7f48e75f8d9213aed1fadd5d689ac11c3937a9ea34162d0e"
         },
         {
           "participant_id": "affected-rep-PA-03",
@@ -86,7 +86,7 @@
           "policy_version_id_anchor": "CV_2",
           "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
           "vote_timestamp": "2026-05-15T10:00:00Z",
-          "signature": "Ed25519-prototype-2026:e8deb90f21efe5df705755a8f036334872c3eae1390c77d29e622c89bd4eb291ac857b8ecc3de29707519bcbb955fee85ed1cdcda98700bfd7817d4101fadc06"
+          "signature": "Ed25519-prototype-2026:be22a4dab96577d9233095e4e7dc697b8254572ebaf832edbe1cd448565750388a5b720ebdaef9d9e81fcb9e90c3160766c2d02090638f1e7426845dd07e9709"
         }
       ],
       "consensus_mechanism": "WEIGHTED_QUORUM",
@@ -170,11 +170,11 @@
       "decision_timestamp": "2026-05-20T14:32:01Z",
       "operational_hash": "sha256:a488327f531d022630e465922b06149c634618e6bb6b797fac12c8f71fc54e35",
       "operator_id": "operator-istanbul-hospital-ER-01",
-      "operator_signature": "Ed25519-prototype-2026:f533071f158a0ae691e8dbd5234cd368c8f83920d443ab6cc6836204b9fda33c4744cc12e824b73acf9779f4bd1d12529caf606df550701ebf80cc93cc501c01",
+      "operator_signature": "Ed25519-prototype-2026:357a0341aea5c11a4afcdf491848562cca1b6e61f41b6b3e0ee21e629bee8b1ed9ce3f1a3b361d1aca5b2701227957cdbceaabf00ddc41c79cefd1e6614aa304",
       "signature_scheme": "Ed25519-prototype-2026",
       "production_signature_target": "ML-DSA (Dilithium-III, FIPS 204)",
       "_signed_bytes_b64hint": "canonical(D) || '||' || P || '||' || T",
-      "_metadata_public_key": "Ed25519-prototype-2026-pub:228a04bfbee7419503641e5748350664e2d271d13f71557a9a3a2c4b9afa25cf",
+      "_metadata_public_key": "Ed25519-prototype-2026-pub:6b5109d13b785257926f6c15c4a92b69bc8a6f0a392d6954c9970118922bbbfe",
       "_metadata_note": "Advisory only. Verifier resolves operator's public key from registry.authorized_operators[operator_id]."
     },
     "por": {
@@ -277,7 +277,7 @@
         "policy_hash": "sha256:7b7d7b5bf0c65b5e6bfe86e2c90bb57d5a1e80113e2ff3bd111a7b07d420a4d9",
         "decision_timestamp": "2026-05-20T14:32:01Z"
       },
-      "graph_signature": "Ed25519-prototype-2026:f9ac67ff97f007f88183df568df5681866ebe71fddcd0b0c4bb2fb397a5f5d1d4d8d89611cfb8510b56b0eb9865e174098141c437c4811496a396960cee5bb01"
+      "graph_signature": "Ed25519-prototype-2026:aa0539df52f7ff2b5d22564a42e0e88449c102f5a6712ce0c116741c88faaf2a6d57b88c91107ef43c31a7e8dc18e2d75b8fc47ebb29bb142993b6f0b4f59809"
     },
     "poc": {
       "conflicts": [
@@ -306,13 +306,13 @@
     }
   },
   "layer_hashes": {
-    "pon_hash": "sha256:6167f51297f9085fb755ed92102058a32c2854d893575741fdb8308fe1f92895",
+    "pon_hash": "sha256:60df49ca4b27b2a1596111fbb2baa17a916ad450371f829e55f9bbc4e6e1ae30",
     "poe_hash": "sha256:bafcd778d913633c5455d3011637556f347bccea3c382ad15e423b2235c24504",
-    "poo_hash": "sha256:5b4bd62cfcccc03f67552ad5fbb92b9ec62b4984a3fdb2d0276bacdfee5bbc4c",
-    "por_hash": "sha256:e816db5512a1f6d60fea3f7edebb6d9501eee9ecb664ccd76003a2efd1081655",
+    "poo_hash": "sha256:e7160e8a777e47a241090f8eed22e78ecde87b735671d33fd6a73a51ce1cbd06",
+    "por_hash": "sha256:cd88ac5310133bbe87d51bcb0076d3b000304f31c3fbcee8af8801a122d1b956",
     "poc_hash": "sha256:c0ccd69ef71287b6393e84d5fc8b9f6a071412361851ab08ab05e956fdbbbe81"
   },
-  "merkle_root": "sha256:f0923f613e7a91bb0b873ef090f9cb9b3e5a40d0e916d84a354e1a80e1f4303e",
+  "merkle_root": "sha256:697df75ae2b43cf66e2e93b11302b294a84b08d5b515f2da675ab573249b92c2",
   "merkle_order": [
     "pon",
     "poe",
@@ -338,7 +338,7 @@
       "merkle_root_match"
     ],
     "checks_failed": [],
-    "verification_timestamp": "2026-05-29T22:11:49Z",
+    "verification_timestamp": "2026-05-29T22:54:25Z",
     "checks_total": 13,
     "trust_chain_summary": "Trusted root → signed registry → registry-anchored participant & operator keys → signed votes + signed PoO/PoR → Merkle root over all five layers."
   }
