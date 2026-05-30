@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oplogica provides deterministic evidence integrity for reviewable AI decisions. Verify whether the recorded evidence around an AI decision is internally consistent, tamper-evident, and reviewable.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Oplogica — Deterministic evidence integrity for reviewable AI decisions">
+<meta property="og:description" content="Verify whether the recorded evidence around an AI decision is internally consistent, tamper-evident, and reviewable. It does not prove decision correctness or certify compliance.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://oplogica.com">
+<meta property="og:site_name" content="Oplogica">
+<meta property="og:image" content="https://oplogica.com/assets/oplogica-hero-banner-dark.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#05080C">
+<title>Oplogica — Deterministic evidence integrity for reviewable AI decisions</title>
+<link rel="icon" type="image/png" href="/assets/oplogica-icon-dark.png">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:        #05080C;   /* near-black navy */
+  --bg-2:      #070B12;
+  --panel:     #0B111A;
+  --panel-2:   #0E151F;
+  --line:      rgba(120, 200, 210, 0.12);
+  --line-soft: rgba(120, 200, 210, 0.07);
+  --cyan:      #2EC5E6;
+  --teal:      #1FC9A6;
+  --green:     #46D17F;
+  --ink:       #F3F7F8;   /* soft white */
+  --muted:     #9FB2BC;
+  --faint:     #6C808C;
+  --grad:      linear-gradient(100deg, #2EC5E6 0%, #1FC9A6 50%, #46D17F 100%);
+  --radius:    16px;
+  --maxw:      1140px;
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+.wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+.grad-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 0.95rem; font-weight: 600; letter-spacing: 0.01em;
+  padding: 13px 22px; border-radius: 11px;
+  border: 1px solid transparent; cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  white-space: nowrap;
+}
+.btn .arrow { transition: transform .2s ease; }
+.btn:hover .arrow { transform: translateX(3px); }
+.btn-primary {
+  background: var(--grad); color: #04222A; font-weight: 700;
+  box-shadow: 0 8px 30px rgba(31, 201, 166, 0.22);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 38px rgba(46, 197, 230, 0.32); }
+.btn-ghost {
+  background: rgba(255,255,255,0.02); color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn-ghost:hover { border-color: rgba(46,197,230,0.45); background: rgba(46,197,230,0.06); transform: translateY(-2px); }
+
+/* ---------- Nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(5, 8, 12, 0.78);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { height: 30px; width: auto; }
+.nav-links { display: flex; align-items: center; gap: 30px; }
+.nav-links a.navlink {
+  font-size: 0.92rem; color: var(--muted); font-weight: 500;
+  transition: color .18s ease; position: relative;
+}
+.nav-links a.navlink:hover { color: var(--ink); }
+.nav-cta {
+  font-size: 0.9rem; font-weight: 600; padding: 9px 16px; border-radius: 9px;
+  border: 1px solid var(--line); color: var(--ink);
+  transition: border-color .18s ease, background .18s ease;
+}
+.nav-cta:hover { border-color: rgba(46,197,230,0.5); background: rgba(46,197,230,0.06); }
+.nav-toggle { display: none; background: none; border: 0; color: var(--ink); font-size: 1.5rem; cursor: pointer; }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; padding: 96px 0 84px; overflow: hidden; }
+.hero::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(900px 420px at 15% -10%, rgba(46,197,230,0.10), transparent 60%),
+    radial-gradient(820px 460px at 95% 10%, rgba(70,209,127,0.08), transparent 60%);
+  pointer-events: none;
+}
+.hero-banner {
+  position: absolute; right: -4%; top: 50%; transform: translateY(-50%);
+  width: 58%; max-width: 760px; opacity: 0.16;
+  mask-image: linear-gradient(to left, #000 40%, transparent 92%);
+  -webkit-mask-image: linear-gradient(to left, #000 40%, transparent 92%);
+  pointer-events: none; user-select: none;
+}
+.hero-inner { position: relative; z-index: 2; max-width: 760px; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); padding: 7px 14px; border: 1px solid var(--line);
+  border-radius: 100px; background: rgba(255,255,255,0.02); margin-bottom: 26px;
+}
+.eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+.hero h1 {
+  font-size: clamp(2.1rem, 5vw, 3.5rem); line-height: 1.08; font-weight: 700;
+  letter-spacing: -0.02em; margin-bottom: 22px;
+}
+.hero .sub {
+  font-size: clamp(1.05rem, 2.1vw, 1.28rem); color: var(--muted);
+  max-width: 640px; margin-bottom: 18px; font-weight: 400;
+}
+.safety-line {
+  display: inline-flex; align-items: flex-start; gap: 10px;
+  font-size: 0.96rem; color: var(--ink); max-width: 600px;
+  padding: 12px 16px; border-left: 2px solid var(--teal);
+  background: rgba(31,201,166,0.06); border-radius: 0 10px 10px 0; margin-bottom: 34px;
+}
+.safety-line svg { flex: 0 0 auto; margin-top: 2px; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 40px; }
+.trust { display: flex; flex-wrap: wrap; gap: 12px 26px; }
+.trust .item { display: flex; align-items: center; gap: 9px; font-size: 0.9rem; color: var(--faint); }
+.trust .tick { color: var(--teal); }
+
+/* ---------- Section scaffolding ---------- */
+section { position: relative; }
+.section-pad { padding: 84px 0; }
+.section-head { max-width: 680px; margin-bottom: 48px; }
+.section-head .kicker {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: 14px;
+}
+.section-head h2 {
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.12;
+}
+.section-head p { color: var(--muted); margin-top: 14px; font-size: 1.05rem; }
+.divider { height: 1px; background: var(--line-soft); }
+
+/* ---------- Proof cards ---------- */
+.cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.card {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 30px 28px; display: flex; flex-direction: column;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.card:hover { transform: translateY(-4px); border-color: rgba(46,197,230,0.3); box-shadow: 0 18px 50px rgba(0,0,0,0.4); }
+.card .ic {
+  width: 44px; height: 44px; border-radius: 12px; margin-bottom: 20px;
+  display: grid; place-items: center;
+  background: rgba(31,201,166,0.10); border: 1px solid rgba(31,201,166,0.25); color: var(--teal);
+}
+.card h3 { font-size: 1.18rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.01em; }
+.card p { color: var(--muted); font-size: 0.97rem; margin-bottom: 22px; flex: 1; }
+.card .card-link {
+  font-size: 0.93rem; font-weight: 600; color: var(--cyan);
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.card .card-link .arrow { transition: transform .2s ease; }
+.card:hover .card-link .arrow { transform: translateX(3px); }
+
+/* ---------- Architecture flow ---------- */
+.flow { display: flex; flex-direction: column; align-items: center; gap: 0; max-width: 560px; margin: 0 auto; }
+.flow-node {
+  width: 100%; background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--line); border-radius: 13px; padding: 18px 24px;
+  display: flex; align-items: center; gap: 16px; position: relative;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.flow-node:hover { border-color: rgba(46,197,230,0.35); transform: translateX(2px); }
+.flow-node .num {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 8px;
+  display: grid; place-items: center; font-size: 0.85rem; font-weight: 700;
+  background: rgba(46,197,230,0.10); border: 1px solid rgba(46,197,230,0.28); color: var(--cyan);
+}
+.flow-node .nbody .t { font-weight: 650; font-size: 1.02rem; }
+.flow-node .nbody .d { font-size: 0.86rem; color: var(--faint); }
+.flow-connector { width: 2px; height: 26px; background: linear-gradient(180deg, var(--cyan), var(--green)); opacity: 0.5; }
+.flow-connector::after {
+  content: "\25BE"; position: relative; color: var(--green); font-size: 0.7rem;
+  left: -4px; top: 14px;
+}
+
+/* ---------- Verify grid ---------- */
+.grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.vcard {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 24px 22px;
+  transition: border-color .2s ease, background .2s ease;
+}
+.vcard:hover { border-color: rgba(70,209,127,0.3); background: var(--panel-2); }
+.vcard .vh { display: flex; align-items: center; gap: 11px; margin-bottom: 11px; }
+.vcard .vdot { width: 9px; height: 9px; border-radius: 50%; background: var(--grad); flex: 0 0 auto; }
+.vcard h4 { font-size: 1.04rem; font-weight: 650; }
+.vcard p { color: var(--muted); font-size: 0.92rem; }
+
+/* ---------- Scope ---------- */
+.scope-band {
+  background:
+    radial-gradient(700px 300px at 80% 0%, rgba(31,201,166,0.06), transparent 70%),
+    var(--bg-2);
+  border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft);
+}
+.scope-wrap { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 48px; align-items: start; }
+.scope-intro h2 { font-size: clamp(1.6rem, 3.4vw, 2.3rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; }
+.scope-intro .kicker {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal); margin-bottom: 14px;
+}
+.scope-intro p { color: var(--muted); margin-top: 16px; font-size: 1.02rem; }
+.scope-badge {
+  margin-top: 22px; display: inline-flex; align-items: center; gap: 10px;
+  font-size: 0.88rem; color: var(--ink); padding: 10px 16px; border-radius: 10px;
+  background: rgba(31,201,166,0.07); border: 1px solid rgba(31,201,166,0.22);
+}
+.scope-list { display: flex; flex-direction: column; gap: 12px; }
+.scope-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px;
+}
+.scope-item .x {
+  flex: 0 0 auto; width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center;
+  background: rgba(255, 120, 120, 0.08); border: 1px solid rgba(255,120,120,0.22); color: #ff8b8b;
+  font-size: 0.9rem;
+}
+.scope-item span.txt { font-size: 0.98rem; color: var(--ink); padding-top: 2px; }
+
+/* ---------- Pilot ---------- */
+.pilot-band { background: var(--bg-2); }
+.pilot-card {
+  background: linear-gradient(135deg, rgba(46,197,230,0.06), rgba(70,209,127,0.05)), var(--panel);
+  border: 1px solid rgba(46,197,230,0.22); border-radius: 22px; padding: 48px;
+  position: relative; overflow: hidden;
+}
+.pilot-card::after {
+  content: ""; position: absolute; right: -60px; top: -60px; width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(31,201,166,0.16), transparent 70%); pointer-events: none;
+}
+.pilot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 2; }
+.pilot-card .kicker { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; }
+.pilot-card h2 { font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
+.pilot-card .offer { color: var(--muted); font-size: 1.05rem; margin-bottom: 24px; }
+.pilot-card .btn-primary { margin-top: 4px; }
+.pilot-scope { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+.pilot-scope li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.97rem; color: var(--ink); }
+.pilot-scope li .ck { color: var(--green); flex: 0 0 auto; margin-top: 3px; }
+.pilot-note { font-size: 0.86rem; color: var(--faint); margin-top: 18px; }
+
+/* ---------- Footer ---------- */
+footer { background: var(--bg-2); border-top: 1px solid var(--line-soft); padding: 56px 0 40px; }
+.foot-top { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 36px; margin-bottom: 40px; }
+.foot-brand img { height: 30px; margin-bottom: 16px; }
+.foot-brand .tagline { font-size: 0.86rem; color: var(--faint); letter-spacing: 0.02em; max-width: 320px; }
+.foot-col h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--faint); margin-bottom: 14px; font-weight: 700; }
+.foot-col a, .foot-col span { display: block; font-size: 0.94rem; color: var(--muted); margin-bottom: 10px; transition: color .18s ease; }
+.foot-col a:hover { color: var(--cyan); }
+.foot-scope {
+  font-size: 0.9rem; color: var(--faint); padding: 18px 0; border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft); margin-bottom: 22px; line-height: 1.6;
+}
+.foot-legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.85rem; color: var(--faint); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 920px) {
+  .cards-3 { grid-template-columns: 1fr; }
+  .grid-6 { grid-template-columns: repeat(2, 1fr); }
+  .scope-wrap { grid-template-columns: 1fr; gap: 30px; }
+  .pilot-grid { grid-template-columns: 1fr; gap: 30px; }
+  .pilot-card { padding: 34px 26px; }
+  .foot-top { grid-template-columns: 1fr 1fr; }
+  .hero-banner { display: none; }
+}
+@media (max-width: 680px) {
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
+    position: absolute; top: 72px; left: 0; right: 0; padding: 22px 24px;
+    background: rgba(5,8,12,0.97); border-bottom: 1px solid var(--line);
+  }
+  .nav-toggle { display: block; }
+  .grid-6 { grid-template-columns: 1fr; }
+  .foot-top { grid-template-columns: 1fr; }
+  .section-pad { padding: 60px 0; }
+  .hero { padding: 64px 0 60px; }
+}
+
+/* ---------- A11y ---------- */
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px;
+}
+.skip-link {
+  position: absolute; left: -9999px; top: 0; background: var(--teal); color: #04222A;
+  padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 600; z-index: 100;
+}
+.skip-link:focus { left: 0; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="/" aria-label="Oplogica home">
+      <img src="/assets/oplogica-logo-horizontal-transparent.png" alt="Oplogica">
+    </a>
+    <nav class="nav-links" id="navlinks" aria-label="Primary">
+      <a class="navlink" href="/ova-demo/ui/">Demo</a>
+      <a class="navlink" href="https://github.com/oplogica/oplogica-verify" rel="noopener" target="_blank">GitHub</a>
+      <a class="navlink" href="#pilot">Pilot</a>
+      <a class="navlink" href="#scope">Scope</a>
+      <a class="navlink" href="mailto:ceo@oplogica.com">Contact</a>
+      <a class="nav-cta" href="/ova-demo/ui/">View Live Demo</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <img class="hero-banner" src="/assets/oplogica-hero-banner-dark.png" alt="" aria-hidden="true">
+  <div class="wrap hero-inner">
+    <span class="eyebrow"><span class="dot"></span> Evidence integrity infrastructure</span>
+    <h1>Deterministic evidence integrity<br>for <span class="grad-text">reviewable AI decisions</span>.</h1>
+    <p class="sub">Oplogica helps teams verify whether the recorded evidence around an AI decision is internally consistent, tamper-evident, and reviewable.</p>
+    <p class="safety-line">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1FC9A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      It does not prove decision correctness or certify compliance.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/ova-demo/ui/">View Live Demo <span class="arrow">&rarr;</span></a>
+      <a class="btn btn-ghost" href="https://github.com/oplogica/oplogica-verify" rel="noopener" target="_blank">View GitHub <span class="arrow">&rarr;</span></a>
+      <a class="btn btn-ghost" href="mailto:ceo@oplogica.com?subject=Oplogica%20Design%20Partner%20Pilot">Request Pilot <span class="arrow">&rarr;</span></a>
+    </div>
+    <div class="trust" aria-label="Trust indicators">
+      <span class="item"><span class="tick">&#10003;</span> Live demo</span>
+      <span class="item"><span class="tick">&#10003;</span> Open-source reference implementation</span>
+      <span class="item"><span class="tick">&#10003;</span> 85 tests passing</span>
+      <span class="item"><span class="tick">&#10003;</span> Delaware company</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PROOF CARDS ===================== -->
+<section class="section-pad">
+  <div class="wrap">
+    <div class="cards-3">
+      <article class="card">
+        <div class="ic" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </div>
+        <h3>Live Demo</h3>
+        <p>Try the OVA evidence integrity demo. A clean evidence bundle verifies VALID, while an intentional T4 tamper verifies INVALID.</p>
+        <a class="card-link" href="/ova-demo/ui/">Open demo <span class="arrow">&rarr;</span></a>
+      </article>
+      <article class="card">
+        <div class="ic" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        </div>
+        <h3>GitHub</h3>
+        <p>Open-source reference implementation with deterministic tests, reproducible demo artifacts, and a documented verification scope.</p>
+        <a class="card-link" href="https://github.com/oplogica/oplogica-verify" rel="noopener" target="_blank">View repository <span class="arrow">&rarr;</span></a>
+      </article>
+      <article class="card">
+        <div class="ic" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <h3>Design Partner Pilot</h3>
+        <p>A controlled design-partner pilot for teams building governed AI workflows. No production integration required.</p>
+        <a class="card-link" href="mailto:ceo@oplogica.com?subject=Oplogica%20Design%20Partner%20Pilot">Request pilot <span class="arrow">&rarr;</span></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ARCHITECTURE ===================== -->
+<section class="section-pad" style="background: var(--bg-2); border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft);">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center; margin: 0 auto 48px;">
+      <div class="kicker">How it works</div>
+      <h2>From decision record to reviewable export</h2>
+      <p style="margin-left:auto;margin-right:auto;">A deterministic pipeline. Every stage is recomputed from the signed record &mdash; no model interpretation, no free-text claim extraction.</p>
+    </div>
+    <div class="flow">
+      <div class="flow-node"><span class="num">1</span><span class="nbody"><span class="t">AI Decision Record</span><span class="d">The recorded inputs, reasoning, and outcome of a decision.</span></span></div>
+      <div class="flow-connector"></div>
+      <div class="flow-node"><span class="num">2</span><span class="nbody"><span class="t">Evidence Bundle</span><span class="d">Structured, signed evidence bound to a governance registry.</span></span></div>
+      <div class="flow-connector"></div>
+      <div class="flow-node"><span class="num">3</span><span class="nbody"><span class="t">Deterministic Verification</span><span class="d">Integrity, binding, and tamper-evidence checks recomputed from the bundle.</span></span></div>
+      <div class="flow-connector"></div>
+      <div class="flow-node"><span class="num">4</span><span class="nbody"><span class="t">L3 Failure Taxonomy</span><span class="d">Structural failures classified by kind, with explicit scope limits.</span></span></div>
+      <div class="flow-connector"></div>
+      <div class="flow-node"><span class="num">5</span><span class="nbody"><span class="t">Reviewable Export</span><span class="d">A reconciled, human-reviewable record of what was &mdash; and was not &mdash; established.</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WHAT OPLOGICA VERIFIES ===================== -->
+<section class="section-pad">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Capabilities</div>
+      <h2>What Oplogica verifies</h2>
+      <p>Deterministic, structural checks over the recorded evidence &mdash; precise about what each one establishes.</p>
+    </div>
+    <div class="grid-6">
+      <div class="vcard"><div class="vh"><span class="vdot"></span><h4>Evidence integrity</h4></div><p>Verifies recorded artifact integrity so the bundle cannot be silently altered after generation.</p></div>
+      <div class="vcard"><div class="vh"><span class="vdot"></span><h4>Tamper detection</h4></div><p>Recomputes hashes and signatures to flag any post-generation change to the recorded evidence.</p></div>
+      <div class="vcard"><div class="vh"><span class="vdot"></span><h4>Registry binding</h4></div><p>Confirms the evidence binds to an authentic governance registry under a pinned trust root.</p></div>
+      <div class="vcard"><div class="vh"><span class="vdot"></span><h4>L3 failure taxonomy</h4></div><p>Flags structural evidence failures and classifies them by kind, deterministically.</p></div>
+      <div class="vcard"><div class="vh"><span class="vdot"></span><h4>Negative claims firewall</h4></div><p>Keeps overclaim boundaries visible by guarding Oplogica's own generated output.</p></div>
+      <div class="vcard"><div class="vh"><span class="vdot"></span><h4>Verification discipline</h4></div><p>Publishes a machine-readable posture: deterministic, no LLM interpretation, scope made explicit.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SCOPE ===================== -->
+<section id="scope" class="scope-band section-pad">
+  <div class="wrap scope-wrap">
+    <div class="scope-intro">
+      <div class="kicker">Scope &amp; honesty</div>
+      <h2>What Oplogica does <span class="grad-text">not</span> claim</h2>
+      <p>Honest scope is the product. Oplogica verifies evidence integrity and binding &mdash; and is explicit about the limits of that guarantee.</p>
+      <div class="scope-badge">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1FC9A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        Integrity and binding &mdash; verified. Everything else &mdash; out of scope, by design.
+      </div>
+    </div>
+    <div class="scope-list">
+      <div class="scope-item"><span class="x" aria-hidden="true">&times;</span><span class="txt">Does not prove the AI decision was correct.</span></div>
+      <div class="scope-item"><span class="x" aria-hidden="true">&times;</span><span class="txt">Does not certify legal compliance.</span></div>
+      <div class="scope-item"><span class="x" aria-hidden="true">&times;</span><span class="txt">Does not establish fairness.</span></div>
+      <div class="scope-item"><span class="x" aria-hidden="true">&times;</span><span class="txt">Does not replace legal, clinical, or regulatory review.</span></div>
+      <div class="scope-item"><span class="x" aria-hidden="true">&times;</span><span class="txt">Does not detect every silent omission.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PILOT ===================== -->
+<section id="pilot" class="pilot-band section-pad">
+  <div class="wrap">
+    <div class="pilot-card">
+      <div class="pilot-grid">
+        <div>
+          <div class="kicker">Design partner pilot</div>
+          <h2>Design partner pilot</h2>
+          <p class="offer">14-day no-fee design partner pilot for teams building or governing AI decision workflows.</p>
+          <a class="btn btn-primary" href="mailto:ceo@oplogica.com?subject=Oplogica%20Design%20Partner%20Pilot">Request a pilot <span class="arrow">&rarr;</span></a>
+          <p class="pilot-note">No production deployment required. Start with a synthetic or non-production workflow. <a href="/pilot.html" style="color:var(--cyan);">Read the full pilot brief &rarr;</a></p>
+        </div>
+        <div>
+          <ul class="pilot-scope">
+            <li><span class="ck">&#10003;</span> 10&ndash;30 decision records</li>
+            <li><span class="ck">&#10003;</span> Synthetic or non-production workflow first</li>
+            <li><span class="ck">&#10003;</span> Evidence bundle review</li>
+            <li><span class="ck">&#10003;</span> Tamper and failure-classification demonstration</li>
+            <li><span class="ck">&#10003;</span> Technical feedback session</li>
+            <li><span class="ck">&#10003;</span> No production deployment required</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <img src="/assets/oplogica-wordmark-transparent.png" alt="Oplogica">
+        <p class="tagline">AI Verification &bull; Decision Intelligence &bull; Institutional Accountability</p>
+      </div>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <a href="/ova-demo/ui/">Live Demo</a>
+        <a href="https://github.com/oplogica/oplogica-verify" rel="noopener" target="_blank">GitHub</a>
+        <a href="#scope">Verification scope</a>
+        <a href="#pilot">Design partner pilot</a>
+      </div>
+      <div class="foot-col">
+        <h5>Contact</h5>
+        <a href="mailto:ceo@oplogica.com">ceo@oplogica.com</a>
+        <a href="mailto:ceo@oplogica.com?subject=Oplogica%20Design%20Partner%20Pilot">Request a pilot</a>
+        <span>Oplogica Inc.</span>
+      </div>
+    </div>
+    <p class="foot-scope">
+      Oplogica verifies evidence integrity and binding. It does not certify correctness, fairness, or legal compliance.
+    </p>
+    <div class="foot-legal">
+      <span>&copy; 2026 Oplogica Inc. All rights reserved.</span>
+      <span>AI Verification &bull; Decision Intelligence &bull; Institutional Accountability</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Minimal, dependency-free mobile nav toggle.
+  (function () {
+    var t = document.getElementById('navToggle');
+    var l = document.getElementById('navlinks');
+    if (!t || !l) return;
+    t.addEventListener('click', function () {
+      var open = l.classList.toggle('open');
+      t.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    l.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') { l.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    });
+  })();
+</script>
+</body>
+</html>

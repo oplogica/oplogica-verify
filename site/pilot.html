@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oplogica design partner pilot — a 14-day no-fee pilot for teams building or governing AI decision workflows.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#05080C">
+<title>Design Partner Pilot — Oplogica</title>
+<link rel="icon" type="image/png" href="/assets/oplogica-icon-dark.png">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #05080C; --bg-2: #070B12; --panel: #0B111A; --panel-2: #0E151F;
+  --line: rgba(120,200,210,0.12); --line-soft: rgba(120,200,210,0.07);
+  --cyan: #2EC5E6; --teal: #1FC9A6; --green: #46D17F;
+  --ink: #F3F7F8; --muted: #9FB2BC; --faint: #6C808C;
+  --grad: linear-gradient(100deg, #2EC5E6 0%, #1FC9A6 50%, #46D17F 100%);
+}
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--ink); line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+.wrap { width: 100%; max-width: 860px; margin: 0 auto; padding: 0 24px; }
+.grad-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+
+.nav { position: sticky; top: 0; z-index: 50; background: rgba(5,8,12,0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line-soft); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+.brand img { height: 30px; }
+.back { font-size: 0.92rem; color: var(--muted); transition: color .18s ease; }
+.back:hover { color: var(--ink); }
+
+.head { padding: 80px 0 36px; text-align: center; position: relative; overflow: hidden; }
+.head::before { content: ""; position: absolute; inset: 0; background: radial-gradient(700px 300px at 50% -20%, rgba(46,197,230,0.10), transparent 65%); pointer-events: none; }
+.kicker { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; position: relative; }
+.head h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; position: relative; }
+.head p { color: var(--muted); font-size: 1.12rem; max-width: 620px; margin: 18px auto 0; position: relative; }
+
+.section { padding: 30px 0; }
+.section h2 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 18px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px 30px; margin-bottom: 22px; }
+.list { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+.list li { display: flex; align-items: flex-start; gap: 12px; font-size: 1rem; color: var(--ink); }
+.list li .ck { color: var(--green); flex: 0 0 auto; margin-top: 4px; }
+.list.neg li .x { color: #ff8b8b; flex: 0 0 auto; margin-top: 2px; font-size: 1.05rem; }
+
+.cta-band { text-align: center; padding: 50px 0 90px; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 9px; font-size: 1rem; font-weight: 700;
+  padding: 15px 28px; border-radius: 12px; background: var(--grad); color: #04222A;
+  box-shadow: 0 8px 30px rgba(31,201,166,0.22); transition: transform .15s ease, box-shadow .2s ease;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 38px rgba(46,197,230,0.32); }
+.cta-band .sub { color: var(--faint); font-size: 0.92rem; margin-top: 16px; }
+
+footer { background: var(--bg-2); border-top: 1px solid var(--line-soft); padding: 34px 0; text-align: center; }
+footer .scope { font-size: 0.9rem; color: var(--faint); max-width: 640px; margin: 0 auto 12px; }
+footer .legal { font-size: 0.84rem; color: var(--faint); }
+a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/" aria-label="Oplogica home"><img src="/assets/oplogica-logo-horizontal-transparent.png" alt="Oplogica"></a>
+    <a class="back" href="/">&larr; Back to home</a>
+  </div>
+</header>
+
+<main>
+  <section class="head">
+    <div class="wrap">
+      <div class="kicker">Design partner pilot</div>
+      <h1>A 14-day pilot for <span class="grad-text">governed AI workflows</span></h1>
+      <p>A 14-day no-fee design partner pilot for teams building or governing AI decision workflows. No production deployment required.</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="section">
+      <h2>Pilot scope</h2>
+      <div class="panel">
+        <ul class="list">
+          <li><span class="ck">&#10003;</span> 10&ndash;30 decision records</li>
+          <li><span class="ck">&#10003;</span> Synthetic or non-production workflow first</li>
+          <li><span class="ck">&#10003;</span> Evidence bundle review</li>
+          <li><span class="ck">&#10003;</span> Tamper and failure-classification demonstration</li>
+          <li><span class="ck">&#10003;</span> Technical feedback session</li>
+          <li><span class="ck">&#10003;</span> No production deployment required</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What we need from design partners</h2>
+      <div class="panel">
+        <ul class="list">
+          <li><span class="ck">&#10003;</span> A representative AI decision workflow (synthetic or non-production to start).</li>
+          <li><span class="ck">&#10003;</span> 10&ndash;30 decision records we can model as evidence bundles.</li>
+          <li><span class="ck">&#10003;</span> A technical contact for a feedback session on the verification output.</li>
+          <li><span class="ck">&#10003;</span> Candid feedback on where evidence integrity and binding fit your review process.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What Oplogica does not claim</h2>
+      <div class="panel">
+        <ul class="list neg">
+          <li><span class="x">&times;</span> Does not prove the AI decision was correct.</li>
+          <li><span class="x">&times;</span> Does not certify legal compliance.</li>
+          <li><span class="x">&times;</span> Does not establish fairness.</li>
+          <li><span class="x">&times;</span> Does not replace legal, clinical, or regulatory review.</li>
+          <li><span class="x">&times;</span> Does not detect every silent omission.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <section class="cta-band">
+    <a class="btn-primary" href="mailto:ceo@oplogica.com?subject=Oplogica%20Design%20Partner%20Pilot">Request a pilot &rarr;</a>
+    <p class="sub">Email <a href="mailto:ceo@oplogica.com" style="color:var(--cyan);">ceo@oplogica.com</a> &middot; we reply to every pilot request.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="scope">Oplogica verifies evidence integrity and binding. It does not certify correctness, fairness, or legal compliance.</p>
+    <p class="legal">&copy; 2026 Oplogica Inc. &bull; AI Verification &bull; Decision Intelligence &bull; Institutional Accountability</p>
+  </div>
+</footer>
+</body>
+</html>
