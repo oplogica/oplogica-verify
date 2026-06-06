@@ -1,13 +1,26 @@
-# OVA — Evidence Integrity Demo
+# OVA: Evidence Integrity Demo
+
+**Evidence integrity infrastructure for reviewable AI decision records.**
+
+*Deterministic, tamper-evident verification of evidence bundles around recorded AI decision artifacts: rule provenance and governance binding, not formal decision correctness.*
 
 **Live demo:** https://oplogica.com/ova-demo/
 
-![OVA dashboard — clean bundle VALID and T4 tamper INVALID](docs/screenshot.png)
+![OVA dashboard: clean bundle VALID and T4 tamper INVALID](docs/screenshot.png)
 
 OVA (the OpLogica Verification Architecture) generates a cryptographically
 verifiable **evidence bundle** for a governance-bound AI decision and lets
 anyone **independently re-verify** it offline. This repository is a runnable,
-deliberately honest **demo** of that verifier.
+deliberately honest **demo** of that verifier: the verification engine
+(`ova_v2.py`, vendored under `ova_engine/`), example JSON artifacts, a demo
+packaging layer, a local dashboard/API, and documentation.
+
+**Repository and hosted demo.** The hosted instance at `oplogica.com/ova-demo`
+is a separately operated deployment. This repository contains the runnable demo,
+including its local dashboard and API; the public site is run and maintained
+separately, so its availability and exact contents may differ from any given
+checkout. See [`DEMO_RELATIONSHIP.md`](DEMO_RELATIONSHIP.md) for how this
+repository, the hosted demo, and any future production product relate.
 
 **What OVA verifies.** That a recorded evidence bundle has not been silently
 altered after generation; that the executed operation binds to a specific
@@ -15,19 +28,19 @@ approved policy version and hash; that recorded reasoning and rules link to the
 active policy constraints; that recorded conflicts remain visible and intact;
 that signatures verify under a pinned demo trust root; and that the recomputed
 Merkle root matches the stored one. The verifier **recomputes** these claims
-from primitive records — it does not trust stored "valid" flags.
+from primitive records; it does not trust stored "valid" flags.
 
 **What OVA does not verify.** It does not establish that a decision was correct,
 that any model behaves fairly, that an institution meets a legal obligation, or
 that this system is fit for real-world critical use. The conflict check confirms
-that *recorded* conflicts stay intact — it does not detect every conflict that
+that *recorded* conflicts stay intact; it does not detect every conflict that
 should have been recorded. The reasoning checks confirm the recorded reasoning
-graph is well formed, authenticated, and bound to the policy and operation —
+graph is well formed, authenticated, and bound to the policy and operation;
 they do not establish reasoning quality or formal entailment.
 
 > **Synthetic medical triage scenario.** The demo scenario is fabricated and
 > illustrative. Not clinical advice, not a medical device, not validated for
-> clinical use. Demo keys only — not HSM-backed, not production PKI.
+> clinical use. Demo keys only, not HSM-backed, not production PKI.
 
 ---
 
@@ -109,7 +122,7 @@ ova_demo/       The demo packaging layer:
                   report_generator.py  human-readable Evidence Integrity Report
                   run_demo.py          one-command pipeline orchestrator
 
-api/            api/server.py — a thin FastAPI wrapper exposing GET /health and
+api/            api/server.py: a thin FastAPI wrapper exposing GET /health and
                 POST /verify over the SAME verify -> reconcile path the CLI
                 uses. It also serves the local dashboard at /ui (static files
                 only; the mount is a no-op if ui/ is absent).
@@ -140,20 +153,20 @@ never the engine's raw count.
 
 Running the pipeline writes two primary artifacts into `./exports`:
 
-- **`tamper_manifest.json`** — machine-readable. For each of the six tamper
+- **`tamper_manifest.json`**: machine-readable. For each of the six tamper
   cases: the mutation, the tampered bundle path, the reconciled status, the
   passed/failed/not_run counts, the failed and not-run checks with reasons, and
   per-check explanation snippets.
-- **`evidence_integrity_report.md`** — human-readable. Title, synthetic-triage
+- **`evidence_integrity_report.md`**: human-readable. Title, synthetic-triage
   banner, scope statement, demo-key/trust-root note, clean-bundle summary with
   the meaning/not-meaning block, a tamper summary table, per-case detail
   sections, reproduction commands, and a limitations section.
 
 Further documentation:
 
-- `docs/ARCHITECTURE.md` — component and data-flow detail.
-- `docs/THREAT_MODEL.md` — what the demo assumes an attacker can and cannot do.
-- `docs/LIMITATIONS.md` — explicit non-claims and known constraints.
+- `docs/ARCHITECTURE.md`: component and data-flow detail.
+- `docs/THREAT_MODEL.md`: what the demo assumes an attacker can and cannot do.
+- `docs/LIMITATIONS.md`: explicit non-claims and known constraints.
 
 ---
 
@@ -209,9 +222,9 @@ Or run them all:
 for t in tests/test_*.py; do echo "== $t =="; python3 "$t" || break; done
 ```
 
-The suite currently comprises **55 tests across 8 files**, and **all included
-tests currently pass**. (Counts are stated concretely; the project avoids
-absolute-coverage percentage phrasing.)
+The suite currently comprises **64 tests across these 8 files**, and **all
+included tests currently pass**. (Counts are stated concretely; the project
+avoids absolute-coverage percentage phrasing.)
 
 ---
 
@@ -263,7 +276,7 @@ layers on top of the existing `verify -> reconcile` path.
   pass. It catches affirmative claims such as "proves compliance" or an
   unqualified "compliant", while allowing honest negated disclaimers such as
   "does not certify compliance". It never inspects or judges user-provided
-  bundle content, and it uses no model — only a fixed term list and
+  bundle content, and it uses no model, only a fixed term list and
   clause-local negation handling.
 - **L3 Coherence Failure Taxonomy** (`ova_demo/l3_failure_taxonomy.py`). For
   each failed or not-run check, it assigns a fixed failure class (for example
@@ -284,7 +297,7 @@ layers on top of the existing `verify -> reconcile` path.
 
 v0.2 does not establish that an AI decision is correct, fair, lawful, or
 clinically valid. A failure means the recorded evidence cannot support
-independent review of the affected item — not that the underlying decision is
+independent review of the affected item, not that the underlying decision is
 sound or flawed.
 
 **Why no LLM interpretation is used**
